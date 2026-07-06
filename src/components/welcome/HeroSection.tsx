@@ -79,7 +79,7 @@ export function HeroSection() {
             {...fade(0.1)}
             className="font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-foreground text-balance sm:text-5xl lg:text-6xl"
           >
-            Shasdhanavi{" "}
+            Sahasdhanavi{" "}
             <span className="relative inline-block bg-linear-to-r from-brand-sky via-brand-sage to-brand-ocean bg-clip-text text-transparent">
               Construction Security
               <span
