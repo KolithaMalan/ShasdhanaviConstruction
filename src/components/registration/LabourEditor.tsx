@@ -101,27 +101,23 @@ export function LabourEditor({ rows, onChange, checkNicEndpoint }: LabourEditorP
             animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-12 items-center gap-3 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur-md"
           >
-            <div className="col-span-12 sm:col-span-3">
+            <div className="col-span-12 sm:col-span-4">
               <div className="text-sm font-medium text-foreground">{row.name}</div>
               <div className="font-mono text-[11px] text-muted-foreground">
                 {row.nicNumber}
               </div>
             </div>
-            <div className="col-span-6 sm:col-span-2">
+            <div className="col-span-6 sm:col-span-3">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Trade</div>
               <div className="text-sm">{row.tradeType}</div>
             </div>
             <div className="col-span-6 sm:col-span-3">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Designation</div>
-              <div className="truncate text-sm">{row.designation}</div>
-            </div>
-            <div className="col-span-6 sm:col-span-2">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Joined</div>
               <div className="text-sm">
                 {new Date(row.joinedDate).toLocaleDateString("en-GB")}
               </div>
             </div>
-            <div className="col-span-6 sm:col-span-2 flex justify-end">
+            <div className="col-span-12 sm:col-span-2 flex justify-end">
               <Button
                 type="button"
                 variant="ghost"
@@ -229,7 +225,12 @@ function InlineLabourForm({
         <Field id="emergencyContact" label="Emergency Contact" error={errors.emergencyContact?.message}>
           <Input id="emergencyContact" {...register("emergencyContact")} placeholder="+94 77 123 4567" />
         </Field>
-        <Field id="tradeType" label="Trade Type" error={errors.tradeType?.message}>
+        <Field
+          id="tradeType"
+          label="Trade Type"
+          error={errors.tradeType?.message}
+          helper="Make sure to select the correct designation."
+        >
           <Select value={trade} onValueChange={(v) => setValue("tradeType", v as LabourInput["tradeType"], { shouldValidate: true })}>
             <SelectTrigger id="tradeType"><SelectValue placeholder="Select trade" /></SelectTrigger>
             <SelectContent>
@@ -238,9 +239,6 @@ function InlineLabourForm({
               ))}
             </SelectContent>
           </Select>
-        </Field>
-        <Field id="designation" label="Designation" error={errors.designation?.message}>
-          <Input id="designation" {...register("designation")} placeholder="e.g. Senior Welder" />
         </Field>
         <Field id="joinedDate" label="Joined Date" error={errors.joinedDate?.message}>
           <Input id="joinedDate" type="date"
@@ -252,7 +250,7 @@ function InlineLabourForm({
         <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
         <Button
           type="button"
-          onClick={handleSubmit((data) => onSave(data))}
+          onClick={handleSubmit((data) => onSave({ ...data, designation: data.tradeType }))}
           disabled={!canSave}
           className="bg-[--color-brand-ocean] text-white hover:bg-[--color-brand-ocean]/90 disabled:opacity-50"
         >

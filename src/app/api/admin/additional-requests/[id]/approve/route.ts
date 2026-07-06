@@ -76,6 +76,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
         vehicleType: v.vehicleType,
         vehicleColour: v.vehicleColour,
         vehiclePurpose: v.vehiclePurpose,
+        vehicleMaterials: v.vehicleMaterials,
       })),
     );
   }

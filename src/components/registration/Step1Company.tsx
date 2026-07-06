@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Building2 } from "lucide-react";
+import { ArrowRight, Building2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,16 @@ import { cn } from "@/lib/utils";
 interface Step1Props {
   defaults: CompanyInput;
   onNext: (data: CompanyInput) => void;
+  submitting?: boolean;
+  submitLabel?: string;
 }
 
-export function Step1Company({ defaults, onNext }: Step1Props) {
+export function Step1Company({
+  defaults,
+  onNext,
+  submitting = false,
+  submitLabel = "Next: Labour",
+}: Step1Props) {
   const {
     register,
     handleSubmit,
@@ -134,10 +141,20 @@ export function Step1Company({ defaults, onNext }: Step1Props) {
       <div className="flex justify-end pt-2">
         <Button
           type="submit"
-          className="h-11 rounded-lg bg-[--color-brand-ocean] px-6 text-white hover:bg-[--color-brand-ocean]/90 active:scale-[0.98]"
+          disabled={submitting}
+          className="h-11 rounded-lg bg-[--color-brand-ocean] px-6 text-white hover:bg-[--color-brand-ocean]/90 active:scale-[0.98] disabled:opacity-60"
         >
-          Next: Labour
-          <ArrowRight className="ml-2 h-4 w-4" />
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting…
+            </>
+          ) : (
+            <>
+              {submitLabel}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
     </form>

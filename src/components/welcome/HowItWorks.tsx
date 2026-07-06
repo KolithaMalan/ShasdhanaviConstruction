@@ -103,7 +103,7 @@ const benefits: Benefit[] = [
   },
   {
     icon: FileCheck2,
-    title: "Zero paperwork",
+    title: "Reduce paperwork",
     body: "Registrations, approvals and records are fully digital — nothing to print, file or lose.",
   },
   {

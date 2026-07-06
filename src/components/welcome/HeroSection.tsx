@@ -125,7 +125,7 @@ export function HeroSection() {
             className="mt-5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-white/45"
           >
             <Activity className="h-3 w-3 text-[--color-brand-sky]" />
-            ISO 45001 · OSHA-aligned · CCTV monitored
+            ISO 45001 · ISO 9001 · ISO 14001 · OSHA-aligned · CCTV monitored
           </motion.p>
 
           {/* Stats strip — mono numerals, dividers, tiny icons */}

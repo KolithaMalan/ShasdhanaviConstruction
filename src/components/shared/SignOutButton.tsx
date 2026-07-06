@@ -23,7 +23,9 @@ export function SignOutButton({
       disabled={pending}
       onClick={() =>
         startTransition(async () => {
-          await signOut({ callbackUrl: "/" });
+          // Clear the session, then hard-navigate to the public home page.
+          await signOut({ redirect: false });
+          window.location.href = "/";
         })
       }
     >

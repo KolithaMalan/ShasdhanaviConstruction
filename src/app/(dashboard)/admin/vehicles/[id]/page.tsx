@@ -101,6 +101,7 @@ export default function AdminVehicleDetailPage({ params }: { params: Promise<{ i
                 <Item label="Type" value={vehicle.vehicleType} />
                 <Item label="Colour" value={vehicle.vehicleColour || "—"} />
                 <Item label="Purpose" value={vehicle.vehiclePurpose || "—"} />
+                <Item label="Materials" value={vehicle.vehicleMaterials || "—"} />
                 <Item label="Status" value={vehicle.status} />
                 <Item label="Currently" value={vehicle.currentStatus === "IN" ? "Inside Site" : "Outside"} />
               </dl>

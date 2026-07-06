@@ -82,6 +82,7 @@ export default function ContractorVehiclesPage() {
                   <TableHead>Type</TableHead>
                   <TableHead>Colour</TableHead>
                   <TableHead>Purpose</TableHead>
+                  <TableHead>Materials</TableHead>
                   <TableHead>QR ID</TableHead>
                   <TableHead>Currently</TableHead>
                   <TableHead className="text-right">QR</TableHead>
@@ -94,6 +95,7 @@ export default function ContractorVehiclesPage() {
                     <TableCell>{v.vehicleType}</TableCell>
                     <TableCell>{v.vehicleColour || "—"}</TableCell>
                     <TableCell className="max-w-[200px] truncate">{v.vehiclePurpose || "—"}</TableCell>
+                    <TableCell className="max-w-[200px] truncate">{v.vehicleMaterials || "—"}</TableCell>
                     <TableCell className="font-mono text-xs">{v.vehicleQrId}</TableCell>
                     <TableCell>
                       <span className={

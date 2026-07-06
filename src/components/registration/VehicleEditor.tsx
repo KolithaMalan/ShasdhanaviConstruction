@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -27,6 +28,7 @@ const emptyRow: VehicleInput = {
   vehicleType: "Truck",
   vehicleColour: "",
   vehiclePurpose: "",
+  vehicleMaterials: "",
 };
 
 export function VehicleEditor({ rows, onChange }: VehicleEditorProps) {
@@ -95,9 +97,13 @@ export function VehicleEditor({ rows, onChange }: VehicleEditorProps) {
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Colour</div>
               <div className="text-sm">{row.vehicleColour}</div>
             </div>
-            <div className="col-span-6 sm:col-span-5">
+            <div className="col-span-6 sm:col-span-3">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Purpose</div>
               <div className="truncate text-sm">{row.vehiclePurpose}</div>
+            </div>
+            <div className="col-span-6 sm:col-span-2">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Materials</div>
+              <div className="truncate text-sm">{row.vehicleMaterials || "—"}</div>
             </div>
             <div className="col-span-12 sm:col-span-2 flex justify-end">
               <Button
@@ -151,6 +157,19 @@ function InlineVehicleForm({
         </Field>
         <Field id="vehiclePurpose" label="Purpose" error={errors.vehiclePurpose?.message}>
           <Input id="vehiclePurpose" {...register("vehiclePurpose")} placeholder="Material transport" />
+        </Field>
+        <Field
+          id="vehicleMaterials"
+          label="Vehicle Materials"
+          className="md:col-span-2"
+          error={errors.vehicleMaterials?.message}
+        >
+          <Textarea
+            id="vehicleMaterials"
+            rows={2}
+            {...register("vehicleMaterials")}
+            placeholder="e.g. Jack, fire extinguishers, chain, belts"
+          />
         </Field>
       </div>
       <div className="mt-5 flex justify-end gap-2">

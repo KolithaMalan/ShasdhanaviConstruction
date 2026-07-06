@@ -85,6 +85,7 @@ export async function POST(req: Request) {
       vehicleType: v.vehicleType,
       vehicleColour: v.vehicleColour,
       vehiclePurpose: v.vehiclePurpose,
+      vehicleMaterials: v.vehicleMaterials,
     })),
   );
 

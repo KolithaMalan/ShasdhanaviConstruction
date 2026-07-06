@@ -27,6 +27,7 @@ const vehicleSchema = new Schema(
     vehicleType: { type: String, enum: VEHICLE_TYPES, required: true },
     vehicleColour: { type: String, required: true, trim: true },
     vehiclePurpose: { type: String, required: true, trim: true },
+    vehicleMaterials: { type: String, default: "", trim: true },
   },
   { _id: true },
 );

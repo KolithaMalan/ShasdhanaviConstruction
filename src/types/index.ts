@@ -49,6 +49,12 @@ export const ADDITIONAL_REQUEST_STATUSES = [
 export type AdditionalRequestStatus = (typeof ADDITIONAL_REQUEST_STATUSES)[number];
 
 export const TRADE_TYPES = [
+  "Project Manager",
+  "Project Engineer",
+  "Supervisor",
+  "Technical Officer",
+  "Survey",
+  "Assistant Engineer",
   "Electrician",
   "Plumber",
   "Welder",
@@ -61,7 +67,6 @@ export const TRADE_TYPES = [
   "Fitter",
   "Machine Operator",
   "Driver",
-  "Supervisor",
   "Safety Officer",
   "Other",
 ] as const;

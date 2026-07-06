@@ -92,7 +92,10 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
           className="cursor-pointer rounded-md text-destructive focus:bg-destructive/10 focus:text-destructive"
           onSelect={(e) => {
             e.preventDefault();
-            void signOut({ callbackUrl: "/" });
+            // Clear the session, then hard-navigate to the public home page.
+            void signOut({ redirect: false }).then(() => {
+              window.location.href = "/";
+            });
           }}
         >
           <LogOut className="mr-2 h-4 w-4" />

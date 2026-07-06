@@ -72,7 +72,9 @@ export const labourSchema = z.object({
   mobileNumber: phoneSchema,
   emergencyContact: phoneSchema,
   tradeType: z.enum(TRADE_TYPES),
-  designation: z.string().min(2, "Designation is required").max(80),
+  // Designation is no longer captured separately — it mirrors the selected
+  // trade type. Kept optional for backward compatibility with existing data.
+  designation: z.string().max(80).optional().default(""),
   joinedDate: z.coerce.date({ invalid_type_error: "Invalid date" }),
 });
 export type LabourInput = z.infer<typeof labourSchema>;
@@ -87,6 +89,7 @@ export const vehicleSchema = z.object({
   vehicleType: z.enum(VEHICLE_TYPES),
   vehicleColour: z.string().min(2, "Vehicle colour is required").max(40),
   vehiclePurpose: z.string().min(2, "Purpose is required").max(200),
+  vehicleMaterials: z.string().max(500).optional().default(""),
 });
 export type VehicleInput = z.infer<typeof vehicleSchema>;
 export const vehicleListSchema = z.array(vehicleSchema);

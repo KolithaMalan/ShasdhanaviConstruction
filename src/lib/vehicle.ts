@@ -16,6 +16,7 @@ interface VehicleInput {
   vehicleType: VehicleType;
   vehicleColour?: string;
   vehiclePurpose?: string;
+  vehicleMaterials?: string;
 }
 
 export interface BulkVehicleOutcome {
@@ -64,6 +65,7 @@ export async function bulkCreateVehicles(
       vehicleType: v.vehicleType,
       vehicleColour: v.vehicleColour ?? "",
       vehiclePurpose: v.vehiclePurpose ?? "",
+      vehicleMaterials: v.vehicleMaterials ?? "",
       vehicleQrId: vid,
       qrCodeData,
       status: "ACTIVE",
@@ -83,6 +85,7 @@ export function serializeVehicle(doc: VehicleDocument) {
     vehicleType: doc.vehicleType,
     vehicleColour: doc.vehicleColour,
     vehiclePurpose: doc.vehiclePurpose,
+    vehicleMaterials: (doc as unknown as { vehicleMaterials?: string }).vehicleMaterials ?? "",
     vehicleQrId: doc.vehicleQrId,
     qrCodeData: doc.qrCodeData,
     status: doc.status,

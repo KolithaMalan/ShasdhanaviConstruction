@@ -14,6 +14,7 @@ const vehicleSchema = new Schema(
     vehicleType: { type: String, enum: VEHICLE_TYPES, required: true },
     vehicleColour: { type: String, default: "" },
     vehiclePurpose: { type: String, default: "" },
+    vehicleMaterials: { type: String, default: "" },
 
     vehicleQrId: { type: String, required: true, unique: true, index: true },
     qrCodeData: { type: String, required: true },
