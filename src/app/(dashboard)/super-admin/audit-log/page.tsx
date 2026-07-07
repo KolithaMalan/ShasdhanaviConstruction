@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClipboardList, Loader2, Search } from "lucide-react";
+import { ClipboardList, FileSpreadsheet, FileText, Loader2, Search } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/PageHeader";
 import { MotionWrapper } from "@/components/shared/MotionWrapper";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -39,12 +40,18 @@ export default function AuditLogPage() {
   const [to, setTo] = useState(today);
   const [loading, setLoading] = useState(false);
 
-  function load() {
-    const params = new URLSearchParams({ limit: "200" });
+  function buildParams() {
+    const params = new URLSearchParams();
     if (action !== "ALL") params.set("action", action);
     if (q.trim()) params.set("userEmail", q.trim());
     if (from) params.set("startDate", from);
     if (to) params.set("endDate", to);
+    return params;
+  }
+
+  function load() {
+    const params = buildParams();
+    params.set("limit", "200");
     setLoading(true);
     fetch(`/api/super-admin/audit-log?${params}`)
       .then((r) => r.json())
@@ -54,6 +61,12 @@ export default function AuditLogPage() {
   }
   useEffect(load, [action]); // eslint-disable-line
 
+  function exportAs(format: "excel" | "pdf") {
+    const params = buildParams();
+    params.set("format", format);
+    window.open(`/api/super-admin/audit-log?${params}`, "_blank");
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <MotionWrapper>
@@ -61,7 +74,17 @@ export default function AuditLogPage() {
           eyebrow="Super Admin"
           title="Audit Log"
           description="Every significant action across the system, immutable and read-only."
-          actions={loading ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : null}
+          actions={
+            <div className="flex items-center gap-2">
+              {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+              <Button variant="outline" size="sm" className="rounded-lg" onClick={() => exportAs("excel")}>
+                <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-lg" onClick={() => exportAs("pdf")}>
+                <FileText className="mr-2 h-4 w-4" /> PDF
+              </Button>
+            </div>
+          }
         />
       </MotionWrapper>
 

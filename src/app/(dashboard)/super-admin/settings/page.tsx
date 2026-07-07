@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { Loader2, Save, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, MailCheck, Save, Send, Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -95,6 +95,7 @@ export default function SettingsPage() {
             <Field id="smtpHost" label="SMTP Host" value={s.smtpHost} onChange={(v) => update("smtpHost", v)} />
             <Field id="smtpPort" label="SMTP Port" type="number" value={String(s.smtpPort)} onChange={(v) => update("smtpPort", Number(v) || 587)} />
             <Field id="smtpFrom" label="SMTP From Address" value={s.smtpFrom} onChange={(v) => update("smtpFrom", v)} />
+            <TestEmailRow />
           </Section>
 
           <Section title="Maintenance Mode">
@@ -129,6 +130,52 @@ function Field({ id, label, value, onChange, type = "text" }: { id: string; labe
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
       <Input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} />
+    </div>
+  );
+}
+
+function TestEmailRow() {
+  const [to, setTo] = useState("");
+  const [pending, start] = useTransition();
+
+  function sendTest() {
+    start(async () => {
+      const res = await fetch("/api/super-admin/settings/test-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(to.trim() ? { to: to.trim() } : {}),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error("Test email failed", { description: body.message ?? "Could not send." });
+        return;
+      }
+      toast.success("Test email sent", { description: `Delivered to ${body.to}. Check the inbox.` });
+    });
+  }
+
+  return (
+    <div className="space-y-1.5 rounded-lg border border-border/60 bg-background/40 p-3">
+      <Label htmlFor="test-email" className="flex items-center gap-1.5">
+        <MailCheck className="h-3.5 w-3.5" /> Send a test email
+      </Label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input
+          id="test-email"
+          type="email"
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+          placeholder="Leave blank to send to your own email"
+          className="flex-1"
+        />
+        <Button type="button" variant="outline" onClick={sendTest} disabled={pending} className="rounded-lg">
+          {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+          Send test
+        </Button>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Verifies the live SMTP pipeline (configured via server environment variables).
+      </p>
     </div>
   );
 }

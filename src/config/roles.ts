@@ -29,6 +29,7 @@ import {
   Boxes,
   ArrowLeftRight,
   BadgeCheck,
+  Megaphone,
 } from "lucide-react";
 
 import { ROLE_VALUES, type Role, type RoleConfig } from "@/types";
@@ -60,6 +61,7 @@ export const roleConfig: Record<Role, RoleConfig> = {
       { label: "All Equipment", href: "/super-admin/equipment", icon: Wrench },
       { label: "Permanent Movements", href: "/permanent-movements", icon: BadgeCheck },
       { label: "Reports Center", href: "/super-admin/reports", icon: FileBarChart },
+      { label: "Announcements", href: "/super-admin/announcements", icon: Megaphone },
       { label: "Audit Log", href: "/super-admin/audit-log", icon: ClipboardList },
       { label: "Notifications", href: "/notifications", icon: Bell },
       { label: "System Settings", href: "/super-admin/settings", icon: Settings },
