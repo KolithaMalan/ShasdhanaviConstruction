@@ -27,14 +27,41 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: siteConfig.name,
-    template: `%s · ${siteConfig.shortName}`,
+    default: siteConfig.searchName,
+    template: `%s · ${siteConfig.searchName}`,
   },
-  description: siteConfig.description,
-  applicationName: siteConfig.shortName,
+  description: siteConfig.seoDescription,
+  applicationName: siteConfig.searchName,
   authors: [{ name: siteConfig.company }],
+  keywords: [...siteConfig.keywords],
   icons: { icon: "/logo.svg" },
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: siteConfig.url,
+    siteName: siteConfig.searchName,
+    title: siteConfig.searchName,
+    description: siteConfig.seoDescription,
+    images: [{ url: "/Sahas.png", width: 1200, height: 630, alt: siteConfig.searchName }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.searchName,
+    description: siteConfig.seoDescription,
+    images: ["/Sahas.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export const viewport: Viewport = {
