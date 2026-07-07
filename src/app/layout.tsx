@@ -36,7 +36,11 @@ export const metadata: Metadata = {
   applicationName: siteConfig.searchName,
   authors: [{ name: siteConfig.company }],
   keywords: [...siteConfig.keywords],
-  icons: { icon: "/logo.svg" },
+  icons: {
+    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/logo.svg" }],
+    apple: [{ url: "/Sahas.png" }],
+  },
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",

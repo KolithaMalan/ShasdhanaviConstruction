@@ -61,7 +61,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
         React.createElement(
           View,
           {},
-          React.createElement(Text, { style: styles.brandKicker }, "SHASDHANAVI CONSTRUCTION"),
+          React.createElement(Text, { style: styles.brandKicker }, "SAHASDHANAVI CONSTRUCTION"),
           React.createElement(Text, { style: styles.brandName }, "Vehicle Site Pass"),
         ),
         React.createElement(Text, { style: { color: "#FFFFFF", fontFamily: "Helvetica-Bold", fontSize: 12 } }, v.companyName ?? ""),
@@ -97,12 +97,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
         React.createElement(Text, { style: styles.noticeText },
           "1. Affix this QR pass to the windscreen, driver side.\n" +
           "2. Present to security officer at the main gate for scan on entry and exit.\n" +
-          "3. This pass is the property of Shasdhanavi Construction (Pvt) Ltd.\n" +
+          "3. This pass is the property of Sahasdhanavi Construction (Pvt) Ltd.\n" +
           "4. Misuse or transfer will result in immediate site-access revocation.",
         ),
       ),
       React.createElement(Text, { style: styles.footer, fixed: true },
-        `Shasdhanavi Construction Security System · vehicle pass · generated ${new Date().toLocaleString("en-GB")}`,
+        `Sahasdhanavi Construction Security System · vehicle pass · generated ${new Date().toLocaleString("en-GB")}`,
       ),
     ),
   );

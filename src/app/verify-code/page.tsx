@@ -4,7 +4,7 @@ import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "Verify Code — Shasdhanavi Construction",
+  title: "Verify Code — Sahasdhanavi Construction",
 };
 
 /**

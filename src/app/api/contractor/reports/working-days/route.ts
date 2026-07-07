@@ -99,7 +99,7 @@ export async function GET(req: Request) {
       React.createElement(
         View,
         { style: styles.headerBar },
-        React.createElement(Text, { style: styles.brand }, "SHASDHANAVI CONSTRUCTION"),
+        React.createElement(Text, { style: styles.brand }, "SAHASDHANAVI CONSTRUCTION"),
         React.createElement(Text, { style: styles.title }, "Workforce Working-Days Report"),
         React.createElement(Text, { style: styles.meta },
           `${user?.companyName ?? user?.name ?? ""}  ·  ${start.toLocaleDateString("en-GB")} → ${end.toLocaleDateString("en-GB")}  ·  Generated ${now.toLocaleString("en-GB")}`),
@@ -151,7 +151,7 @@ export async function GET(req: Request) {
       ),
       React.createElement(
         Text, { style: styles.footer, fixed: true },
-        "Shasdhanavi Construction Security System — Working-days based on actual gate IN scans",
+        "Sahasdhanavi Construction Security System — Working-days based on actual gate IN scans",
       ),
     ),
   );

@@ -67,7 +67,7 @@ export function QrStickerPdf({ equipment, qrDataUrl }: Props) {
         <View style={styles.card}>
           <View style={styles.header}>
             <View style={styles.brand}>
-              <Text style={styles.brandKicker}>SHASDHANAVI CONSTRUCTION</Text>
+              <Text style={styles.brandKicker}>SAHASDHANAVI CONSTRUCTION</Text>
               <Text style={styles.brandName}>Electrical QR Pass</Text>
             </View>
           </View>
@@ -93,7 +93,7 @@ export function QrStickerPdf({ equipment, qrDataUrl }: Props) {
             </View>
           </View>
 
-          <Text style={styles.footer}>Scan at gate · Property of Shasdhanavi Construction</Text>
+          <Text style={styles.footer}>Scan at gate · Property of Sahasdhanavi Construction</Text>
         </View>
       </Page>
     </Document>

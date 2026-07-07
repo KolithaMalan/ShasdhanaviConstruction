@@ -43,10 +43,10 @@ export function IdCardVisual({ employee, qrDataUrl }: Props) {
 
         <header className="relative flex items-center gap-2 px-4 pt-3 text-white">
           <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded bg-white/15 ring-1 ring-inset ring-white/30">
-            <Image src="/Sahas.png" alt="Shasdhanavi" width={28} height={28} className="h-full w-full object-contain p-0.5" />
+            <Image src="/Sahas.png" alt="Sahasdhanavi" width={28} height={28} className="h-full w-full object-contain p-0.5" />
           </div>
           <div className="leading-tight">
-            <div className="font-mono text-[7px] uppercase tracking-[0.18em] text-white/90">Shasdhanavi Construction</div>
+            <div className="font-mono text-[7px] uppercase tracking-[0.18em] text-white/90">Sahasdhanavi Construction</div>
             <div className="text-[10px] font-semibold">Site Access Pass</div>
           </div>
         </header>
@@ -118,7 +118,7 @@ export function IdCardVisual({ employee, qrDataUrl }: Props) {
           </div>
           <div className="mt-2 text-center">
             <div className="font-mono text-[7px] uppercase tracking-[0.18em] text-[#19183B]/60">
-              Shasdhanavi Construction (Pvt) Ltd
+              Sahasdhanavi Construction (Pvt) Ltd
             </div>
             <div className="mt-0.5 font-mono text-[8px] font-bold tracking-wider text-[#19183B]">
               {employee.employeeId ?? employee.nicNumber}
@@ -128,7 +128,7 @@ export function IdCardVisual({ employee, qrDataUrl }: Props) {
 
         <footer className="absolute inset-x-0 bottom-0 border-t border-[#19183B]/10 bg-[#E7F2EF] px-4 py-1.5">
           <div className="flex items-center justify-between text-[7px] text-[#19183B]/80">
-            <span>Property of Shasdhanavi</span>
+            <span>Property of Sahasdhanavi</span>
             <span className="font-mono">v2 · {new Date().getFullYear()}</span>
           </div>
         </footer>

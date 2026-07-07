@@ -43,7 +43,7 @@ export function Logo({
       >
         <Image
           src="/Sahas.png"
-          alt="Shasdhanavi Construction"
+          alt={`${siteConfig.searchName} — ${siteConfig.company} logo`}
           width={s.px}
           height={s.px}
           className="h-full w-full object-contain p-0.5"

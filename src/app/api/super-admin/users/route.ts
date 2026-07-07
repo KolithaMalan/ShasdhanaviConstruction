@@ -100,9 +100,9 @@ export async function POST(req: Request) {
 
   void sendEmail({
     to: user.email,
-    subject: "Account Created — Shasdhanavi System",
+    subject: "Account Created — Sahasdhanavi System",
     html: `<p>Hello ${user.name},</p>
-           <p>An account has been created for you on the Shasdhanavi Construction Security System.</p>
+           <p>An account has been created for you on the Sahasdhanavi Construction Security System.</p>
            <p><strong>Email:</strong> ${user.email}<br/>
               <strong>Temporary password:</strong> ${generatedPassword}</p>
            <p>You will be required to change this password on first sign-in.</p>`,

@@ -66,7 +66,7 @@ export function ToolMovementReportPdf({ companyName, startDate, endDate, generat
     <Document title={`Tool-Movements-${companyName}`}>
       <Page size="A4" orientation="portrait" style={styles.page}>
         <View style={styles.headerBar}>
-          <Text style={styles.brand}>SHASDHANAVI CONSTRUCTION</Text>
+          <Text style={styles.brand}>SAHASDHANAVI CONSTRUCTION</Text>
           <Text style={styles.title}>Tool Movement Report</Text>
           <Text style={styles.meta}>
             {companyName} · {startDate} → {endDate} · Generated {generatedAt}
@@ -106,7 +106,7 @@ export function ToolMovementReportPdf({ companyName, startDate, endDate, generat
         ))}
 
         <Text style={styles.footer} fixed render={({ pageNumber, totalPages }) =>
-          `Shasdhanavi Construction · Tool Movement Report · Page ${pageNumber}/${totalPages}`
+          `Sahasdhanavi Construction · Tool Movement Report · Page ${pageNumber}/${totalPages}`
         } />
       </Page>
     </Document>

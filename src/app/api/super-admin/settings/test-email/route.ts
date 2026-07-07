@@ -26,9 +26,9 @@ export async function POST(req: Request) {
   const sentAt = new Date().toLocaleString("en-GB");
   const result = await sendEmail({
     to,
-    subject: "Shasdhanavi — SMTP test email",
+    subject: "Sahasdhanavi — SMTP test email",
     html: `
-      <p>This is a test email from the Shasdhanavi Security &amp; HSEQ system.</p>
+      <p>This is a test email from the Sahasdhanavi Security &amp; HSEQ system.</p>
       <p>If you are reading this, your SMTP configuration is working correctly.</p>
       <p style="color:#888;font-size:12px">Triggered by ${guard.session.user.email ?? "Super Admin"} at ${sentAt}.</p>
     `,

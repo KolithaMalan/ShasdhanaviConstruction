@@ -69,7 +69,7 @@ export default function SuperAdminPage() {
                 System Command Center
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                Real-time overview of the Shasdhanavi Construction Security System.
+                Real-time overview of the Sahasdhanavi Construction Security System.
                 Live counts, charts, and audit activity refresh automatically.
               </p>
               <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">

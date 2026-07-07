@@ -51,7 +51,7 @@ export default function RegistrationSuccessPage() {
               Your request has been submitted
             </h1>
             <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-              The Shasdhanavi Admin team has been notified and will review your
+              The Sahasdhanavi Admin team has been notified and will review your
               registration. You will receive an email once the outcome is ready.
             </p>
 

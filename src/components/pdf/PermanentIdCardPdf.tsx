@@ -165,7 +165,7 @@ function Header({ logoDataUrl }: { logoDataUrl: string }) {
         <View style={styles.logoBadge}>
           {logoDataUrl ? <Image src={logoDataUrl} style={styles.logoImg} /> : null}
         </View>
-        <Text style={styles.brandName}>SHASDHANAVI CONSTRUCTION</Text>
+        <Text style={styles.brandName}>SAHASDHANAVI CONSTRUCTION</Text>
         <Text style={styles.brandTitle}>Site Access Pass</Text>
       </View>
       <View style={styles.accentLine} />
@@ -209,7 +209,7 @@ function CardBack({ employee, qrDataUrl, logoDataUrl }: Props) {
         <View style={styles.backQrBox}>
           <Image src={qrDataUrl} style={styles.backQrImg} />
         </View>
-        <Text style={styles.backCaption}>SHASDHANAVI CONSTRUCTION (PVT) LTD</Text>
+        <Text style={styles.backCaption}>SAHASDHANAVI CONSTRUCTION (PVT) LTD</Text>
         <Text style={styles.backId}>{employee.permanentId}</Text>
       </View>
 

@@ -87,7 +87,7 @@ export function ReportPdfTemplate({
       <Page size="A4" orientation={orientation} style={styles.page}>
         <View style={styles.headerBar}>
           <View>
-            <Text style={styles.brand}>SHASDHANAVI CONSTRUCTION</Text>
+            <Text style={styles.brand}>SAHASDHANAVI CONSTRUCTION</Text>
             <Text style={styles.title}>{title}</Text>
             {subtitle && <Text style={styles.meta}>{subtitle}</Text>}
             {filters && <Text style={styles.meta}>{filters}</Text>}
@@ -138,7 +138,7 @@ export function ReportPdfTemplate({
         ))}
 
         <Text style={styles.footer} fixed render={({ pageNumber, totalPages }) =>
-          `${title} · Page ${pageNumber} of ${totalPages} · Shasdhanavi Construction Security System`
+          `${title} · Page ${pageNumber} of ${totalPages} · Sahasdhanavi Construction Security System`
         } />
       </Page>
     </Document>

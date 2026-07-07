@@ -41,7 +41,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
   void sendEmail({
     to: user.email,
-    subject: "Password Reset — Shasdhanavi System",
+    subject: "Password Reset — Sahasdhanavi System",
     html: `<p>Hello ${user.name},</p>
            <p>Your password has been reset by an administrator. Your new temporary password is:</p>
            <p><strong>${newPassword}</strong></p>

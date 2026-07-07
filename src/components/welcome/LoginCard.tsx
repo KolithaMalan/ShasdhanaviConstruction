@@ -402,7 +402,7 @@ export function LoginCard() {
                       id="email"
                       type="email"
                       autoComplete="email"
-                      placeholder="you@shasdhanavi.lk"
+                      placeholder="you@sahasdhanavi.lk"
                       disabled={pending}
                       aria-invalid={!!errors.email}
                       aria-describedby={errors.email ? "email-error" : undefined}

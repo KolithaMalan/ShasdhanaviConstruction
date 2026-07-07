@@ -47,7 +47,7 @@ export default async function ContractorRegistrationPage() {
             Submit your contractor registration request
           </h1>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Provide your company details to register. Once submitted, the Shasdhanavi
+            Provide your company details to register. Once submitted, the Sahasdhanavi
             Admin team will review and email you with the outcome. After approval, you
             can add your workforce, vehicles and equipment from your dashboard.
           </p>

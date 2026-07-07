@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       permanentEmployeeId: perm._id,
       entityName: perm.name,
       entityIdentifier: perm.permanentId || perm.nicNumber,
-      companyName: "Shasdhanavi (Permanent)",
+      companyName: "Sahasdhanavi (Permanent)",
       direction,
       scannedAt: now,
       gateLocation,

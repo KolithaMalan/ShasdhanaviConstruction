@@ -224,7 +224,7 @@ function CardFront({ employee, photoAbsoluteUrl }: Omit<Props, "qrDataUrl">) {
   return (
     <View style={styles.card}>
       <View style={styles.headerStrip}>
-        <Text style={styles.brandKicker}>SHASDHANAVI CONSTRUCTION</Text>
+        <Text style={styles.brandKicker}>SAHASDHANAVI CONSTRUCTION</Text>
         <Text style={styles.brandName}>Site Access Pass</Text>
       </View>
       <View style={styles.accentLine} />
@@ -276,14 +276,14 @@ function CardBack({ employee, qrDataUrl }: Omit<Props, "photoAbsoluteUrl">) {
         <View style={styles.backQrBox}>
           <Image src={qrDataUrl} style={styles.backQrImg} />
         </View>
-        <Text style={styles.backCaption}>SHASDHANAVI CONSTRUCTION (PVT) LTD</Text>
+        <Text style={styles.backCaption}>SAHASDHANAVI CONSTRUCTION (PVT) LTD</Text>
         <Text style={styles.backEmpId}>
           {employee.employeeId ?? employee.nicNumber}
         </Text>
       </View>
 
       <View style={styles.backFooter}>
-        <Text style={styles.backFooterText}>Property of Shasdhanavi</Text>
+        <Text style={styles.backFooterText}>Property of Sahasdhanavi</Text>
         <Text style={styles.backFooterText}>
           v2 · {new Date().getFullYear()}
         </Text>

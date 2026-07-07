@@ -193,7 +193,7 @@ export function HowItWorks() {
               </span>
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Shasdhanavi Construction has moved its entire security and
+              Sahasdhanavi Construction has moved its entire security and
               compliance workflow online. From the gate to the control room,
               paperwork is replaced with a fast, secure and transparent digital
               platform — built for everyone working on the power-plant project.
@@ -268,7 +268,7 @@ export function HowItWorks() {
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <Image
                       src={item.src}
-                      alt={item.title}
+                      alt={`${item.title} — Sahasdhanavi power plant construction site`}
                       fill
                       sizes="(min-width: 768px) 33vw, 100vw"
                       className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-110"

@@ -1,6 +1,6 @@
-# Shasdhanavi Construction Security System — Phase 1
+# Sahasdhanavi Construction Security System — Phase 1
 
-Enterprise security management platform for the Shasdhanavi power plant
+Enterprise security management platform for the Sahasdhanavi power plant
 construction site.
 
 ## Phase 1 Scope

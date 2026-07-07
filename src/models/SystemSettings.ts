@@ -2,7 +2,7 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
 const systemSettingsSchema = new Schema(
   {
-    companyName: { type: String, default: "Shasdhanavi Construction" },
+    companyName: { type: String, default: "Sahasdhanavi Construction" },
     companyLogo: { type: String, default: "" },
     siteName: { type: String, default: "Power Plant Construction Site" },
 

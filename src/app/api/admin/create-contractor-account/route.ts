@@ -125,7 +125,7 @@ export async function POST(req: Request) {
   if (electricalOutcome.created > 0 || nonElectricalOutcome.created > 0) {
     void sendEmail({
       to: reg.email,
-      subject: "Tools & Equipment Registered — Shasdhanavi System",
+      subject: "Tools & Equipment Registered — Sahasdhanavi System",
       html: `<p>Hello <strong>${reg.companyName}</strong>,</p>
              <p>Your account is now set up. The following items are registered:</p>
              <ul>

@@ -48,13 +48,13 @@ export async function buildPdf(spec: ReportSpec): Promise<Buffer> {
 
 export async function buildExcel(spec: ReportSpec): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Shasdhanavi Construction Security System";
+  wb.creator = "Sahasdhanavi Construction Security System";
   wb.created = new Date();
   const sheet = wb.addWorksheet(spec.sheetName ?? spec.title.slice(0, 31));
 
   // Brand header row
   sheet.mergeCells(1, 1, 1, spec.columns.length);
-  sheet.getCell(1, 1).value = "SHASDHANAVI CONSTRUCTION";
+  sheet.getCell(1, 1).value = "SAHASDHANAVI CONSTRUCTION";
   sheet.getCell(1, 1).font = { bold: true, size: 11, color: { argb: "FFFFFFF0" } };
   sheet.getCell(1, 1).alignment = { horizontal: "left", vertical: "middle" };
   sheet.getCell(1, 1).fill = {

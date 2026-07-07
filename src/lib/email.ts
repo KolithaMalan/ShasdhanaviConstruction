@@ -5,7 +5,7 @@ const SMTP_PORT = Number(process.env.SMTP_PORT ?? 587);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
 const SMTP_FROM =
-  process.env.SMTP_FROM ?? "Shasdhanavi Security System <noreply@shasdhanavi.com>";
+  process.env.SMTP_FROM ?? "Sahasdhanavi Security System <noreply@sahasdhanavi.com>";
 
 export const ADMIN_NOTIFY_EMAIL =
   process.env.ADMIN_NOTIFY_EMAIL ?? "NuwanRasika@gmail.com";
@@ -61,7 +61,7 @@ export async function sendEmail(input: SendEmailInput): Promise<{
 }
 
 /* ───────────────────────────────────────────────────────────
-   HTML template helpers — Shasdhanavi branded, dark theme
+   HTML template helpers — Sahasdhanavi branded, dark theme
    ─────────────────────────────────────────────────────────── */
 
 function baseTemplate(title: string, bodyHtml: string, ctaUrl?: string, ctaLabel?: string): string {
@@ -83,7 +83,7 @@ function baseTemplate(title: string, bodyHtml: string, ctaUrl?: string, ctaLabel
                 <table width="100%"><tr>
                   <td>
                     <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#FFFFF0;opacity:.85;font-family:'Courier New',monospace">
-                      Shasdhanavi Construction
+                      Sahasdhanavi Construction
                     </div>
                     <div style="font-size:18px;font-weight:600;color:#FFFFF0;margin-top:4px;">
                       Security &amp; HSEQ System
@@ -115,14 +115,14 @@ function baseTemplate(title: string, bodyHtml: string, ctaUrl?: string, ctaLabel
             <tr>
               <td style="padding:18px 32px;border-top:1px solid #2A2A58;background:#161534;">
                 <div style="font-size:11px;color:#A1C2BD;line-height:1.6;">
-                  This is an automated message from the Shasdhanavi Construction Security System.
+                  This is an automated message from the Sahasdhanavi Construction Security System.
                   Please do not reply directly to this email.
                 </div>
               </td>
             </tr>
           </table>
           <div style="font-size:11px;color:#708993;margin-top:14px;font-family:'Courier New',monospace">
-            © ${new Date().getFullYear()} Shasdhanavi Construction (Pvt) Ltd
+            © ${new Date().getFullYear()} Sahasdhanavi Construction (Pvt) Ltd
           </div>
         </td>
       </tr>
@@ -209,12 +209,12 @@ interface ApprovalInput {
 }
 
 export async function notifyContractorApproval(input: ApprovalInput) {
-  const subject = `Your Registration is Approved — Shasdhanavi System`;
+  const subject = `Your Registration is Approved — Sahasdhanavi System`;
 
   const body = `
     <p style="margin:0 0 14px;">
       Welcome aboard, <strong>${escapeHtml(input.companyName)}</strong>. Your contractor
-      registration has been approved by the Shasdhanavi Admin team. Your account is ready.
+      registration has been approved by the Sahasdhanavi Admin team. Your account is ready.
     </p>
 
     <div style="margin:18px 0;padding:18px;background:#19183B;border:1px solid #2A2A58;border-radius:12px;">
@@ -260,7 +260,7 @@ interface RejectionInput {
 export async function notifyContractorRejection(input: RejectionInput) {
   const isCorrections = input.mode === "CORRECTIONS_REQUESTED";
   const title = isCorrections ? "Corrections Requested" : "Registration Decision";
-  const subject = `Registration Update — Shasdhanavi System`;
+  const subject = `Registration Update — Sahasdhanavi System`;
 
   const body = `
     <p style="margin:0 0 14px;">
@@ -464,7 +464,7 @@ export async function notifyTwoFactorCode(input: TwoFactorEmailInput) {
       Hello${input.companyName ? ` <strong>${escapeHtml(input.companyName)}</strong>` : ""},
     </p>
     <p style="margin:0 0 14px;">
-      Use the verification code below to finish signing in to the Shasdhanavi Construction Security System.
+      Use the verification code below to finish signing in to the Sahasdhanavi Construction Security System.
     </p>
 
     <div style="margin:22px 0;text-align:center;">

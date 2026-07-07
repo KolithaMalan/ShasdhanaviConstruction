@@ -89,14 +89,14 @@ export function SafetyPassStickerPdf({ equipment }: Props) {
             <View style={styles.noticeBox}>
               <Text style={styles.noticeTitle}>HSEQ ELECTRICAL CLEARANCE</Text>
               <Text style={styles.noticeText}>
-                This item has passed Shasdhanavi HSEQ electrical inspection and is approved for site use until the next-due date.
+                This item has passed Sahasdhanavi HSEQ electrical inspection and is approved for site use until the next-due date.
                 Re-inspection required after expiry.
               </Text>
             </View>
           </View>
 
           <Text style={styles.footer}>
-            Shasdhanavi Construction · Electrical Safety Pass
+            Sahasdhanavi Construction · Electrical Safety Pass
           </Text>
         </View>
       </Page>
