@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.company }],
   keywords: [...siteConfig.keywords],
   icons: {
-    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
-    shortcut: [{ url: "/logo.svg" }],
-    apple: [{ url: "/Sahas.png" }],
+    icon: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
+    shortcut: [{ url: "/icon.png" }],
+    apple: [{ url: "/icon.png" }],
   },
   alternates: { canonical: "/" },
   openGraph: {

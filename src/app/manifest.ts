@@ -17,15 +17,16 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#146C94",
     icons: [
       {
-        src: "/logo.svg",
-        sizes: "any",
-        type: "image/svg+xml",
-      },
-      {
-        src: "/Sahas.png",
+        src: "/icon.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: "/icon.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };
