@@ -67,6 +67,13 @@ const ACTION_FEATURES: Record<ToggleableRole, FeatureDef[]> = {
         "Approve or reject contractor registrations and additional labour/vehicle/equipment requests.",
       kind: "ACTION",
     },
+    {
+      key: "action:id.verify",
+      label: "On-site ID verification",
+      description:
+        "Scan someone's ID QR during a site walk to see who they are. Read-only — records no IN/OUT movement.",
+      kind: "ACTION",
+    },
   ],
   MEDICAL_OFFICER: [
     {
@@ -77,6 +84,13 @@ const ACTION_FEATURES: Record<ToggleableRole, FeatureDef[]> = {
     },
   ],
   HSEQ_OFFICER: [
+    {
+      key: "action:id.verify",
+      label: "On-site ID verification",
+      description:
+        "Scan someone's ID QR during a site walk to see who they are. Read-only — records no IN/OUT movement.",
+      kind: "ACTION",
+    },
     {
       key: "action:gate.scan",
       label: "Gate QR scanning",
