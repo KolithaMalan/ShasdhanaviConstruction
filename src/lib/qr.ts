@@ -40,6 +40,9 @@ export function parseQr(raw: string): AnyQrPayload | null {
       case "PERMANENT_EMPLOYEE":
         if (typeof parsed.pid === "string") return parsed as AnyQrPayload;
         return null;
+      case "WORKER":
+        if (typeof parsed.wid === "string") return parsed as AnyQrPayload;
+        return null;
       default:
         return null;
     }

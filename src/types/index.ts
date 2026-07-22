@@ -145,8 +145,12 @@ export const EMPLOYEE_STATUS_LABELS: Record<EmployeeStatus, string> = {
 
 /* ─── Phase 4 — Security gate / movement ─────────── */
 
-export const SCAN_ENTITY_TYPES = ["EMPLOYEE", "VISITOR", "VEHICLE", "PERMANENT"] as const;
+export const SCAN_ENTITY_TYPES = ["EMPLOYEE", "VISITOR", "VEHICLE", "PERMANENT", "WORKER"] as const;
 export type ScanEntityType = (typeof SCAN_ENTITY_TYPES)[number];
+
+/** Companies the Yugadhanavi/Sobadhanavi worker module registers under. */
+export const WORKER_COMPANIES = ["Yugadhanavi", "Sobadhanavi"] as const;
+export type WorkerCompany = (typeof WORKER_COMPANIES)[number];
 
 export const SCAN_DIRECTIONS = ["IN", "OUT"] as const;
 export type ScanDirection = (typeof SCAN_DIRECTIONS)[number];
@@ -190,13 +194,19 @@ export type PermanentEmployeeQrPayload = {
   type: "PERMANENT_EMPLOYEE";
   pid: string; // permanentId
 };
+/** Yugadhanavi/Sobadhanavi worker access pass — no expiry. */
+export type WorkerQrPayload = {
+  type: "WORKER";
+  wid: string; // workerId
+};
 export type AnyQrPayload =
   | EmployeeQrPayload
   | VisitorPassQrPayload
   | VehicleQrPayload
   | ElectricalEquipmentQrPayload
   | MaterialsPassQrPayload
-  | PermanentEmployeeQrPayload;
+  | PermanentEmployeeQrPayload
+  | WorkerQrPayload;
 
 /* ─── Phase 5 — Tools & Equipment management ─────── */
 

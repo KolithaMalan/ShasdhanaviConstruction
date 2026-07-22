@@ -22,7 +22,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const guard = await requireRole(["SECURITY_OFFICER", "SUPER_ADMIN"]);
+  const guard = await requireRole(["SECURITY_OFFICER", "HSEQ_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));

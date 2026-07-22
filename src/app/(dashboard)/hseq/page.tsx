@@ -1,11 +1,17 @@
 import Link from "next/link";
 import {
   Activity, ArrowRight, BadgeCheck, ClipboardCheck, Clock, Users,
-  Zap, ShieldAlert, CheckCircle2, XCircle,
+  Zap, ShieldAlert, CheckCircle2, XCircle, HardHat, Truck, Building2,
+  UsersRound, ArrowDownToLine, ArrowUpFromLine,
 } from "lucide-react";
 
 import { connectDB } from "@/lib/db";
 import { EmployeeModel } from "@/models/Employee";
+import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
+import { WorkerModel } from "@/models/Worker";
+import { VehicleModel } from "@/models/Vehicle";
+import { UserModel } from "@/models/User";
+import { MovementLogModel } from "@/models/MovementLog";
 import { ElectricalEquipmentModel } from "@/models/ElectricalEquipment";
 import { checkExpiredIdCards } from "@/lib/idCardChecker";
 
@@ -51,29 +57,81 @@ export default async function HseqDashboardPage() {
       .sort({ inspectedAt: -1 }).limit(5).lean(),
   ]);
 
+  /* ── Site monitoring (read-only) — live head count + attendance ── */
+  const [
+    employeesInside, permanentInside, workersInside, vehiclesInside,
+    scansToday, inToday, outToday,
+    totalWorkers, totalPermanent, totalContractors,
+  ] = await Promise.all([
+    EmployeeModel.countDocuments({ currentStatus: "IN", status: "ACTIVE" }),
+    PermanentEmployeeModel.countDocuments({ currentStatus: "IN" }),
+    WorkerModel.countDocuments({ currentStatus: "IN" }),
+    VehicleModel.countDocuments({ currentStatus: "IN", status: "ACTIVE" }),
+    MovementLogModel.countDocuments({ scannedAt: { $gte: startOfDay } }),
+    MovementLogModel.countDocuments({ direction: "IN", scannedAt: { $gte: startOfDay } }),
+    MovementLogModel.countDocuments({ direction: "OUT", scannedAt: { $gte: startOfDay } }),
+    WorkerModel.countDocuments({}),
+    PermanentEmployeeModel.countDocuments({}),
+    UserModel.countDocuments({ role: "CONTRACTOR", isActive: true }),
+  ]);
+  const headCount = employeesInside + permanentInside + workersInside;
+
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <MotionWrapper>
         <PageHeader
           eyebrow="HSEQ Officer"
           title="HSEQ Console"
-          description="Induct workforce, inspect contractor electrical equipment, and issue site clearance."
+          description="Monitor the site, register permanent staff & workers, scan the gate, induct workforce and inspect electrical equipment."
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <Button asChild variant="outline" className="rounded-lg">
-                <Link href="/hseq/electrical-inspection">
-                  <Zap className="mr-2 h-4 w-4" /> Electrical Inspection
+                <Link href="/hseq/workers">
+                  <HardHat className="mr-2 h-4 w-4" /> Worker Registration
                 </Link>
               </Button>
               <Button asChild className="rounded-lg bg-[--color-brand-ocean] text-white hover:bg-[--color-brand-ocean]/90">
-                <Link href="/hseq/induction">
-                  Induction <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="/hseq/gate-scan">
+                  Gate Scan <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
           }
         />
       </MotionWrapper>
+
+      {/* Site monitoring — live head count + attendance (read-only) */}
+      <div>
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.22em] text-[--color-brand-ocean]">
+          Site Monitoring · Live
+        </p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <MotionWrapper delay={0.04}>
+            <StatsCard icon={UsersRound} label="Head Count Inside" value={headCount} accent="info"
+                       hint={`${workersInside} workers · ${permanentInside} staff · ${employeesInside} contractor emp.`} />
+          </MotionWrapper>
+          <MotionWrapper delay={0.06}>
+            <StatsCard icon={ArrowDownToLine} label="IN Today" value={inToday} accent="success" hint={`${scansToday} scans today`} />
+          </MotionWrapper>
+          <MotionWrapper delay={0.08}>
+            <StatsCard icon={ArrowUpFromLine} label="OUT Today" value={outToday} accent="warning" />
+          </MotionWrapper>
+          <MotionWrapper delay={0.1}>
+            <StatsCard icon={Truck} label="Vehicles Inside" value={vehiclesInside} />
+          </MotionWrapper>
+        </div>
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionWrapper delay={0.12}>
+            <StatsCard icon={HardHat} label="Registered Workers" value={totalWorkers} />
+          </MotionWrapper>
+          <MotionWrapper delay={0.14}>
+            <StatsCard icon={BadgeCheck} label="Permanent Staff" value={totalPermanent} />
+          </MotionWrapper>
+          <MotionWrapper delay={0.16}>
+            <StatsCard icon={Building2} label="Active Contractors" value={totalContractors} />
+          </MotionWrapper>
+        </div>
+      </div>
 
       {/* Induction stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

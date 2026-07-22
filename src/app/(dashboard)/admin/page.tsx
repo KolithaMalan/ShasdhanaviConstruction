@@ -21,6 +21,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { AdminDashboardTabs } from "@/components/admin/AdminDashboardTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +37,9 @@ export default async function AdminPage() {
     AdditionalRequestModel.countDocuments({ status: "PENDING" }),
   ]);
 
-  return (
-    <div className="mx-auto max-w-7xl space-y-8">
+  /* The previous main dashboard — now the second ("Operations") tab. */
+  const operations = (
+    <div className="space-y-8">
       <MotionWrapper>
         <PageHeader
           eyebrow="Admin · HSEQ"
@@ -164,6 +166,20 @@ export default async function AdminPage() {
           )}
         </div>
       </MotionWrapper>
+    </div>
+  );
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6">
+      <MotionWrapper>
+        <PageHeader
+          eyebrow="Admin · HSEQ"
+          title="Site Command Center"
+          description="Live overview of everyone on site, attendance, vehicles, tools and contractors."
+        />
+      </MotionWrapper>
+
+      <AdminDashboardTabs operationsSlot={operations} />
     </div>
   );
 }

@@ -24,6 +24,7 @@ import { VehicleResultPanel } from "@/components/security/VehicleResultPanel";
 import { VisitorPanel } from "@/components/security/VisitorPanel";
 import { MaterialsPanel } from "@/components/security/MaterialsPanel";
 import { PermanentEmployeePanel } from "@/components/security/PermanentEmployeePanel";
+import { WorkerPanel } from "@/components/security/WorkerPanel";
 
 const WebcamQrScanner = dynamic(
   () => import("@/components/security/WebcamQrScanner"),
@@ -51,6 +52,15 @@ type ScanResult =
         department: string; nicNumber: string; permanentId: string; photoUrl: string;
         currentStatus: "IN" | "OUT";
       };
+    }
+  | {
+      kind: "WORKER";
+      worker: {
+        id: string; name: string; company: string; designation: string;
+        nicNumber: string; workerId: string; photoUrl: string;
+        currentStatus: "IN" | "OUT";
+      };
+      openVisit: null | { id: string; items: { name: string }[]; checkInAt: string | null };
     }
   | { kind: "ERROR"; code: string; message: string };
 
@@ -448,6 +458,17 @@ export function ScanWorkstation() {
           ) : result.kind === "PERMANENT_EMPLOYEE" ? (
             <motion.div key={`perm-${result.permanent.id}`} animate={shakeFx(shake)} initial={{ opacity: 0, y: 8 }} exit={{ opacity: 0 }}>
               <PermanentEmployeePanel permanent={result.permanent} pending={marking} onMark={markPermanent} onReset={resetForNextScan} />
+            </motion.div>
+          ) : result.kind === "WORKER" ? (
+            <motion.div key={`wrk-${result.worker.id}`} animate={shakeFx(shake)} initial={{ opacity: 0, y: 8 }} exit={{ opacity: 0 }}>
+              <WorkerPanel
+                worker={result.worker}
+                openVisit={result.openVisit}
+                gate={gate}
+                scanMethod={mode}
+                onCompleted={() => { refreshStats(); resetForNextScan(); }}
+                onReset={resetForNextScan}
+              />
             </motion.div>
           ) : (
             <motion.div

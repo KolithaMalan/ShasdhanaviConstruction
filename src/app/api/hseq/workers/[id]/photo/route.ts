@@ -1,25 +1,27 @@
 import mongoose from "mongoose";
 
 import { connectDB } from "@/lib/db";
-import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
+import { WorkerModel } from "@/models/Worker";
 import { requireRole, jsonError } from "@/lib/api";
 import { decodeImageDataUrl, processProfilePhoto } from "@/lib/photoService";
 
 export const runtime = "nodejs";
 
-/** Serve the permanent employee photo. Security needs this to preview the
- *  pass holder at the gate. */
+/** Serve the worker photo. Gate scanners need this to preview the pass holder. */
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await requireRole(["ADMIN_HSEQ", "HSEQ_OFFICER", "SUPER_ADMIN", "SECURITY_OFFICER"]);
+  const guard = await requireRole([
+    "ADMIN_HSEQ",
+    "HSEQ_OFFICER",
+    "SUPER_ADMIN",
+    "SECURITY_OFFICER",
+  ]);
   if (!guard.ok) return guard.response;
 
   const { id } = await ctx.params;
   if (!mongoose.Types.ObjectId.isValid(id)) return jsonError("Invalid id", 400);
 
   await connectDB();
-  const doc = await PermanentEmployeeModel.findById(id)
-    .select("+photoData +photoMimeType")
-    .exec();
+  const doc = await WorkerModel.findById(id).select("+photoData +photoMimeType").exec();
   if (!doc?.photoData) return jsonError("No photo", 404);
 
   const raw = doc.photoData as unknown;
@@ -46,7 +48,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
 
 interface Body { photoDataUrl?: string }
 
-/** Replace the permanent employee photo (re-capture / re-upload). */
+/** Replace the worker photo (re-capture / re-upload). */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const guard = await requireRole(["HSEQ_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
@@ -65,8 +67,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   }
 
   await connectDB();
-  const photoUrl = `/api/admin/permanent-employees/${id}/photo`;
-  const res = await PermanentEmployeeModel.updateOne(
+  const photoUrl = `/api/hseq/workers/${id}/photo`;
+  const res = await WorkerModel.updateOne(
     { _id: id },
     { $set: { photoData: processed, photoMimeType: "image/jpeg", photoUrl } },
   );

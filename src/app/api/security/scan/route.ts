@@ -6,6 +6,8 @@ import { VehicleModel } from "@/models/Vehicle";
 import { VisitorPassModel } from "@/models/VisitorPass";
 import { VisitorModel } from "@/models/Visitor";
 import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
+import { WorkerModel } from "@/models/Worker";
+import { WorkerGateVisitModel } from "@/models/WorkerGateVisit";
 import { BlacklistedNICModel } from "@/models/BlacklistedNIC";
 import mongoose from "mongoose";
 
@@ -21,7 +23,7 @@ export const runtime = "nodejs";
 interface Body { qrData?: string }
 
 export async function POST(req: Request) {
-  const guard = await requireRole(["SECURITY_OFFICER", "SUPER_ADMIN"]);
+  const guard = await requireRole(["SECURITY_OFFICER", "HSEQ_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
 
   const body = (await req.json().catch(() => ({}))) as Body;
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
   const looksLikeVisitorPass = !parsed && /^VP-\d{2,}$/i.test(upper);
   const looksLikeVehicleId = !parsed && /^VEH-\d{4}-[A-Z0-9]{5,}$/i.test(upper);
   const looksLikePermanentId = !parsed && /^PERM-\d{4}-[A-Z0-9]{5,}$/i.test(upper);
+  const looksLikeWorkerId = !parsed && /^WRK-\d{4}-[A-Z0-9]{5,}$/i.test(upper);
 
   /* ── EMPLOYEE ──────────────────────────────────────── */
   if (parsed?.type === "EMPLOYEE" || looksLikeEmpId || looksLikeNic) {
@@ -214,6 +217,47 @@ export async function POST(req: Request) {
     });
   }
 
+  /* ── WORKER (Yugadhanavi / Sobadhanavi) ─────────────── */
+  if (parsed?.type === "WORKER" || looksLikeWorkerId) {
+    const wid = parsed?.type === "WORKER" ? parsed.wid : upper;
+    const worker = await WorkerModel.findOne({ workerId: wid }).lean();
+    if (!worker) {
+      return NextResponse.json({
+        kind: "ERROR",
+        code: "WORKER_NOT_FOUND",
+        message: "Worker pass not registered. Contact HSEQ.",
+      });
+    }
+
+    /* Any OPEN item record (morning items) for this worker, shown so the
+       officer can verify items on OUT. */
+    const openVisit = await WorkerGateVisitModel.findOne({
+      workerId: worker._id,
+      status: "OPEN",
+    }).lean();
+
+    return NextResponse.json({
+      kind: "WORKER",
+      worker: {
+        id: String(worker._id),
+        name: worker.name,
+        company: worker.company,
+        designation: worker.designation,
+        nicNumber: worker.nicNumber,
+        workerId: worker.workerId,
+        photoUrl: worker.photoUrl ?? "",
+        currentStatus: worker.currentStatus ?? "OUT",
+      },
+      openVisit: openVisit
+        ? {
+            id: String(openVisit._id),
+            items: (openVisit.items ?? []).map((i) => ({ name: i.name ?? "" })),
+            checkInAt: openVisit.checkInAt ? new Date(openVisit.checkInAt).toISOString() : null,
+          }
+        : null,
+    });
+  }
+
   /* ── MATERIALS PASS ─────────────────────────────────── */
   if (parsed?.type === "MATERIALS_PASS") {
     if (!mongoose.Types.ObjectId.isValid(parsed.cid)) {
@@ -235,6 +279,6 @@ export async function POST(req: Request) {
     kind: "ERROR",
     code: "INVALID_QR",
     message:
-      "Unrecognised input. Use a scanned QR, an Employee ID (SHA-YYYY-XXXXX), an NIC, a visitor pass (VP-001), a vehicle ID (VEH-YYYY-XXXXX), or a permanent pass (PERM-YYYY-XXXXX).",
+      "Unrecognised input. Use a scanned QR, an Employee ID (SHA-YYYY-XXXXX), an NIC, a visitor pass (VP-001), a vehicle ID (VEH-YYYY-XXXXX), a permanent pass (PERM-YYYY-XXXXX), or a worker pass (WRK-YYYY-XXXXX).",
   });
 }

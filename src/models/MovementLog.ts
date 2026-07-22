@@ -9,6 +9,7 @@ const movementLogSchema = new Schema(
     visitorId:  { type: Schema.Types.ObjectId, ref: "Visitor",  default: null, index: true },
     vehicleId:  { type: Schema.Types.ObjectId, ref: "Vehicle",  default: null, index: true },
     permanentEmployeeId: { type: Schema.Types.ObjectId, ref: "PermanentEmployee", default: null, index: true },
+    workerId: { type: Schema.Types.ObjectId, ref: "Worker", default: null, index: true },
 
     /* Snapshots — avoid expensive joins on hot read paths */
     entityName: { type: String, required: true, trim: true },

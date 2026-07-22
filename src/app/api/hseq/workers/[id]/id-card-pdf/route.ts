@@ -3,12 +3,12 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import React from "react";
 
 import { connectDB } from "@/lib/db";
-import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
+import { WorkerModel } from "@/models/Worker";
 import { requireRole, jsonError } from "@/lib/api";
-import { serializePermanentEmployee } from "@/lib/permanentEmployee";
+import { serializeWorker } from "@/lib/worker";
 import { qrPngDataUrl } from "@/lib/qr";
 import { getSahasLogoDataUrl } from "@/lib/brandAssets";
-import { PermanentIdCardPdf } from "@/components/pdf/PermanentIdCardPdf";
+import { WorkerIdCardPdf } from "@/components/pdf/WorkerIdCardPdf";
 import { logAction } from "@/lib/auditLogger";
 
 export const runtime = "nodejs";
@@ -21,13 +21,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   if (!mongoose.Types.ObjectId.isValid(id)) return jsonError("Invalid id", 400);
 
   await connectDB();
-  const doc = await PermanentEmployeeModel.findById(id)
-    .select("+photoData +photoMimeType")
-    .exec();
-  if (!doc) return jsonError("Permanent employee not found", 404);
+  const doc = await WorkerModel.findById(id).select("+photoData +photoMimeType").exec();
+  if (!doc) return jsonError("Worker not found", 404);
   if (!doc.qrCodeData) return jsonError("ID card not issued yet", 404);
 
-  const employee = serializePermanentEmployee(doc);
+  const worker = serializeWorker(doc);
   const [qrDataUrl, logoDataUrl] = await Promise.all([
     qrPngDataUrl(doc.qrCodeData, 600),
     getSahasLogoDataUrl(),
@@ -50,7 +48,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     photoDataUrl = `data:${doc.photoMimeType || "image/jpeg"};base64,${photoBuf.toString("base64")}`;
   }
 
-  const element = React.createElement(PermanentIdCardPdf, { employee, qrDataUrl, logoDataUrl, photoDataUrl });
+  const element = React.createElement(WorkerIdCardPdf, { worker, qrDataUrl, logoDataUrl, photoDataUrl });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buffer = await renderToBuffer(element as any);
 
@@ -60,16 +58,16 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     userEmail: guard.session.user.email ?? "",
     userRole: guard.session.user.role,
     action: "DOWNLOAD_REPORT",
-    entityType: "PermanentIdCard",
-    entityId: employee.permanentId,
-    description: `Downloaded permanent ID card for ${employee.name}`,
+    entityType: "WorkerIdCard",
+    entityId: worker.workerId,
+    description: `Downloaded worker ID card for ${worker.name}`,
     request: req,
   });
 
   return new Response(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="permanent-id-${employee.permanentId}.pdf"`,
+      "Content-Disposition": `attachment; filename="worker-id-${worker.workerId}.pdf"`,
       "Cache-Control": "no-store",
     },
   });

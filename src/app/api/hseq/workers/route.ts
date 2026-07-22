@@ -1,68 +1,81 @@
 import { NextResponse } from "next/server";
 
 import { connectDB } from "@/lib/db";
-import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
+import { WorkerModel } from "@/models/Worker";
 import { requireRole, jsonError } from "@/lib/api";
-import { createPermanentEmployee, serializePermanentEmployee } from "@/lib/permanentEmployee";
+import { createWorker, serializeWorker } from "@/lib/worker";
 import { decodeImageDataUrl, processProfilePhoto } from "@/lib/photoService";
 import { logAction } from "@/lib/auditLogger";
+import { WORKER_COMPANIES, type WorkerCompany } from "@/types";
 
 export const runtime = "nodejs";
 
+/* Nuwan (ADMIN_HSEQ) may view; Dinesh (HSEQ_OFFICER) + Super Admin manage. */
+const VIEW_ROLES = ["ADMIN_HSEQ", "HSEQ_OFFICER", "SUPER_ADMIN"] as const;
+const MANAGE_ROLES = ["HSEQ_OFFICER", "SUPER_ADMIN"] as const;
+
 export async function GET(req: Request) {
-  // Nuwan (ADMIN_HSEQ) keeps view access; Dinesh (HSEQ_OFFICER) + Super Admin manage.
-  const guard = await requireRole(["ADMIN_HSEQ", "HSEQ_OFFICER", "SUPER_ADMIN"]);
+  const guard = await requireRole([...VIEW_ROLES]);
   if (!guard.ok) return guard.response;
 
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim();
+  const company = searchParams.get("company")?.trim();
 
   const filter: Record<string, unknown> = {};
+  if (company && WORKER_COMPANIES.includes(company as WorkerCompany)) {
+    filter.company = company;
+  }
   if (q) {
     filter.$or = [
       { name: { $regex: q, $options: "i" } },
       { nicNumber: { $regex: q, $options: "i" } },
-      { permanentId: { $regex: q, $options: "i" } },
+      { workerId: { $regex: q, $options: "i" } },
       { designation: { $regex: q, $options: "i" } },
       { department: { $regex: q, $options: "i" } },
     ];
   }
 
   await connectDB();
-  const docs = await PermanentEmployeeModel.find(filter).sort({ createdAt: -1 }).limit(1000);
+  const docs = await WorkerModel.find(filter).sort({ createdAt: -1 }).limit(1000);
 
-  return NextResponse.json({ items: docs.map(serializePermanentEmployee) });
+  return NextResponse.json({ items: docs.map(serializeWorker) });
 }
 
 interface Body {
   name?: string;
+  company?: string;
   designation?: string;
   department?: string;
   nicNumber?: string;
+  mobileNumber?: string;
   photoDataUrl?: string;
 }
 
 export async function POST(req: Request) {
-  // Registration authority moved from Nuwan to Dinesh (HSEQ_OFFICER).
-  const guard = await requireRole(["HSEQ_OFFICER", "SUPER_ADMIN"]);
+  const guard = await requireRole([...MANAGE_ROLES]);
   if (!guard.ok) return guard.response;
 
   const body = (await req.json().catch(() => ({}))) as Body;
   const name = body.name?.trim();
+  const company = body.company?.trim();
   const designation = body.designation?.trim() ?? "";
   const department = body.department?.trim() ?? "";
   const nicNumber = body.nicNumber?.trim().toUpperCase();
+  const mobileNumber = body.mobileNumber?.trim() ?? "";
 
   if (!name) return jsonError("Name is required", 400);
+  if (!company || !WORKER_COMPANIES.includes(company as WorkerCompany)) {
+    return jsonError("A valid company (Yugadhanavi or Sobadhanavi) is required", 400);
+  }
   if (!nicNumber) return jsonError("NIC is required", 400);
 
   await connectDB();
 
-  const existing = await PermanentEmployeeModel.exists({ nicNumber });
-  if (existing) return jsonError("A permanent employee with this NIC already exists", 409);
+  const existing = await WorkerModel.exists({ nicNumber });
+  if (existing) return jsonError("A worker with this NIC already exists", 409);
 
-  /* Process the optional photo before we create anything, so a bad image
-     fails fast without leaving an orphan record. */
+  /* Process the optional photo first, so a bad image fails fast. */
   let photo: Buffer | null = null;
   if (body.photoDataUrl) {
     try {
@@ -74,11 +87,13 @@ export async function POST(req: Request) {
 
   let doc;
   try {
-    doc = await createPermanentEmployee({
+    doc = await createWorker({
       name,
+      company: company as WorkerCompany,
       designation,
       department,
       nicNumber,
+      mobileNumber,
       createdBy: guard.session.user.id,
       createdByName: guard.session.user.name ?? "",
     });
@@ -89,8 +104,8 @@ export async function POST(req: Request) {
   }
 
   if (photo) {
-    const photoUrl = `/api/admin/permanent-employees/${doc._id}/photo`;
-    await PermanentEmployeeModel.updateOne(
+    const photoUrl = `/api/hseq/workers/${doc._id}/photo`;
+    await WorkerModel.updateOne(
       { _id: doc._id },
       { $set: { photoData: photo, photoMimeType: "image/jpeg", photoUrl } },
     );
@@ -103,11 +118,11 @@ export async function POST(req: Request) {
     userEmail: guard.session.user.email ?? "",
     userRole: guard.session.user.role,
     action: "CREATE",
-    entityType: "PermanentEmployee",
-    entityId: doc.permanentId ?? "",
-    description: `Created permanent employee ${name} (${doc.permanentId ?? ""})`,
+    entityType: "Worker",
+    entityId: doc.workerId ?? "",
+    description: `Registered ${company} worker ${name} (${doc.workerId ?? ""})`,
     request: req,
   });
 
-  return NextResponse.json({ item: serializePermanentEmployee(doc) }, { status: 201 });
+  return NextResponse.json({ item: serializeWorker(doc) }, { status: 201 });
 }
