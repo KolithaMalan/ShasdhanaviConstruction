@@ -13,16 +13,18 @@ interface TopbarProps {
   name: string;
   email: string;
   role: Role;
+  /** Feature keys the Super Admin has switched off for this role. */
+  disabledFeatures?: string[];
 }
 
-export function Topbar({ name, email, role }: TopbarProps) {
+export function Topbar({ name, email, role, disabledFeatures = [] }: TopbarProps) {
   function openPalette() {
     window.dispatchEvent(new Event("open-command-palette"));
   }
 
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/60 bg-background/60 px-3 backdrop-blur-xl sm:px-4 md:px-6 md:gap-4">
-      <MobileNav role={role} />
+      <MobileNav role={role} disabledFeatures={disabledFeatures} />
       {/* Search trigger — opens the command palette */}
       <div className="flex flex-1 items-center">
         <button

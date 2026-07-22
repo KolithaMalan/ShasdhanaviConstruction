@@ -8,6 +8,7 @@ import { ElectricalEquipmentModel } from "@/models/ElectricalEquipment";
 import { NonElectricalToolModel } from "@/models/NonElectricalTool";
 import { ToolMovementModel } from "@/models/ToolMovement";
 import { requireRole, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 import { withOptionalTransaction } from "@/lib/tools";
 import { logAction } from "@/lib/auditLogger";
 import { createNotification } from "@/lib/notificationService";
@@ -32,6 +33,9 @@ const bodySchema = z.object({
 export async function POST(req: Request) {
   const guard = await requireRole(["INTERNAL_SECURITY", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:gatepass.process");
+  if (blocked) return blocked;
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

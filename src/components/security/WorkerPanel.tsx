@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import {
-  ArrowDownToLine, ArrowUpFromLine, HardHat, Loader2, Package,
+  ArrowDownToLine, ArrowUpFromLine, HardHat, Loader2, Lock, Package,
   Plus, RotateCcw, Trash2, X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -23,7 +23,11 @@ interface WorkerInfo {
 
 interface Props {
   worker: WorkerInfo;
-  openVisit: null | { id: string; items: { name: string }[]; checkInAt: string | null };
+  openVisit: null | {
+    id: string;
+    items: { name: string; addedAt?: string | null }[];
+    checkInAt: string | null;
+  };
   gate: string;
   scanMethod: "QR_SCANNER" | "WEBCAM" | "MANUAL";
   onCompleted: () => void;
@@ -48,7 +52,12 @@ export function WorkerPanel({ worker, openVisit, gate, scanMethod, onCompleted, 
 
   /* Returning from lunch = already OUTside but has an OPEN record. */
   const returningWithRecord = direction === "IN" && !!openVisit;
+  /* Items already on record — shown read-only while re-entering so the officer
+     can see what's still on site with them before adding anything new. */
+  const alreadyOnRecord = returningWithRecord ? openVisit.items.map((i) => i.name) : [];
 
+  /* `items` is what this scan submits: on IN the items being carried in right
+     now (appended to any existing record), on OUT the full list leaving. */
   const [items, setItems] = useState<string[]>(
     direction === "OUT" && openVisit ? openVisit.items.map((i) => i.name) : [],
   );
@@ -73,7 +82,8 @@ export function WorkerPanel({ worker, openVisit, gate, scanMethod, onCompleted, 
             ? {
                 action: "IN",
                 workerId: worker.id,
-                items: returningWithRecord ? [] : items.map((name) => ({ name })),
+                /* Appended server-side when a record is already open. */
+                items: items.map((name) => ({ name })),
                 gateLocation: gate,
                 scanMethod,
               }
@@ -149,11 +159,38 @@ export function WorkerPanel({ worker, openVisit, gate, scanMethod, onCompleted, 
           <p className="text-sm font-semibold">
             {direction === "IN"
               ? returningWithRecord
-                ? "Items on record (from this morning)"
+                ? "Re-entry — add any NEW items"
                 : "Items brought IN"
-              : "Items taken OUT — verify against morning items"}
+              : "Items taken OUT — verify against what came in"}
           </p>
         </div>
+
+        {/* Already on record (re-entry only) — read-only reference. */}
+        {returningWithRecord && (
+          <div className="mb-4 rounded-lg border border-border/50 bg-muted/30 p-3">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Already on record
+              {openVisit.checkInAt
+                ? ` · since ${new Date(openVisit.checkInAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`
+                : ""}
+            </p>
+            {alreadyOnRecord.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Nothing was recorded earlier today.</p>
+            ) : (
+              <ul className="flex flex-wrap gap-2">
+                {alreadyOnRecord.map((it, idx) => (
+                  <li
+                    key={`rec-${it}-${idx}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-background/60 px-2.5 py-1 text-sm text-muted-foreground"
+                  >
+                    <Lock className="h-3 w-3" />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         {direction === "OUT" && openVisit && (
           <p className="mb-3 text-[11px] text-muted-foreground">
@@ -162,25 +199,27 @@ export function WorkerPanel({ worker, openVisit, gate, scanMethod, onCompleted, 
           </p>
         )}
 
-        {!returningWithRecord && (
-          <div className="mb-3 flex gap-2">
-            <Input
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addItem(); } }}
-              placeholder="e.g. Jack, fire extinguisher, chain, belt"
-              className="h-10"
-            />
-            <Button type="button" variant="outline" onClick={addItem} className="h-10 rounded-lg">
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+        <div className="mb-3 flex gap-2">
+          <Input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addItem(); } }}
+            placeholder={
+              returningWithRecord
+                ? "New item brought back — e.g. grinder, extension cord"
+                : "e.g. Jack, fire extinguisher, chain, belt"
+            }
+            className="h-10"
+          />
+          <Button type="button" variant="outline" onClick={addItem} className="h-10 rounded-lg">
+            <Plus className="mr-1.5 h-4 w-4" /> Add Item
+          </Button>
+        </div>
 
         {items.length === 0 ? (
           <p className="text-xs text-muted-foreground">
             {returningWithRecord
-              ? "No items were recorded this morning."
+              ? "No new items. Leave empty if the worker returns with nothing extra."
               : "No items added. Leave empty if the worker brings nothing."}
           </p>
         ) : (
@@ -188,19 +227,23 @@ export function WorkerPanel({ worker, openVisit, gate, scanMethod, onCompleted, 
             {items.map((it, idx) => (
               <li
                 key={`${it}-${idx}`}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-card/70 px-2.5 py-1 text-sm"
+                className={
+                  "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-sm " +
+                  (returningWithRecord
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                    : "border-border/60 bg-card/70")
+                }
               >
+                {returningWithRecord && <Plus className="h-3 w-3" />}
                 {it}
-                {!returningWithRecord && (
-                  <button
-                    type="button"
-                    onClick={() => removeItem(idx)}
-                    className="text-muted-foreground hover:text-destructive"
-                    aria-label={`Remove ${it}`}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => removeItem(idx)}
+                  className="text-muted-foreground hover:text-destructive"
+                  aria-label={`Remove ${it}`}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
               </li>
             ))}
           </ul>
@@ -215,7 +258,14 @@ export function WorkerPanel({ worker, openVisit, gate, scanMethod, onCompleted, 
           className="relative mt-5 h-14 w-full rounded-xl bg-emerald-600 text-base font-semibold text-white hover:bg-emerald-700 disabled:opacity-40"
         >
           {pending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ArrowDownToLine className="mr-2 h-5 w-5" />}
-          Mark IN{returningWithRecord ? " (returning)" : items.length ? ` · ${items.length} item(s)` : ""}
+          Mark IN
+          {returningWithRecord
+            ? items.length
+              ? ` (returning · +${items.length} new item(s))`
+              : " (returning)"
+            : items.length
+              ? ` · ${items.length} item(s)`
+              : ""}
         </Button>
       ) : (
         <div className="relative mt-5 space-y-3">

@@ -8,6 +8,7 @@ import { VehicleModel } from "@/models/Vehicle";
 import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
 import { MovementLogModel } from "@/models/MovementLog";
 import { requireRole, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 import { logAction } from "@/lib/auditLogger";
 import { SCAN_DIRECTIONS, SCAN_METHODS } from "@/types";
 
@@ -24,6 +25,9 @@ const bodySchema = z.object({
 export async function POST(req: Request) {
   const guard = await requireRole(["SECURITY_OFFICER", "HSEQ_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:gate.scan");
+  if (blocked) return blocked;
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return jsonError("Invalid payload", 422);

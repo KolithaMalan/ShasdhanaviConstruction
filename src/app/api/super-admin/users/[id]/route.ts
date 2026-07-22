@@ -54,6 +54,16 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const doc = await UserModel.findById(id);
   if (!doc) return jsonError("Not found", 404);
 
+  /* Email is the sign-in identifier, so it must stay unique. Check up front to
+     return a readable message instead of a raw duplicate-key error. */
+  if (parsed.data.email) {
+    const email = parsed.data.email.toLowerCase();
+    const clash = await UserModel.findOne({ email, _id: { $ne: doc._id } })
+      .select("_id")
+      .lean();
+    if (clash) return jsonError("That email is already used by another account", 409);
+  }
+
   const before: Record<string, unknown> = {};
   for (const key of Object.keys(parsed.data) as (keyof typeof parsed.data)[]) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +88,10 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     action: parsed.data.isActive === false ? "BLOCK_USER" : parsed.data.isActive === true ? "UNBLOCK_USER" : "UPDATE",
     entityType: "User",
     entityId: String(doc._id),
-    description: `Updated user ${doc.email}`,
+    description:
+      parsed.data.email && before.email !== doc.email
+        ? `Changed sign-in email ${String(before.email)} → ${doc.email}`
+        : `Updated user ${doc.email}`,
     metadata: { before, after: parsed.data },
     request: req,
   });

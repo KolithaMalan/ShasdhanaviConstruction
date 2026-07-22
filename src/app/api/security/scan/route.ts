@@ -17,6 +17,7 @@ import { serializeVehicle } from "@/lib/vehicle";
 import { loadContractorMaterials } from "@/lib/materialsPass";
 import { checkExpiredIdCards } from "@/lib/idCardChecker";
 import { requireRole, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,9 @@ interface Body { qrData?: string }
 export async function POST(req: Request) {
   const guard = await requireRole(["SECURITY_OFFICER", "HSEQ_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:gate.scan");
+  if (blocked) return blocked;
 
   const body = (await req.json().catch(() => ({}))) as Body;
   const raw = (body.qrData ?? "").trim();
@@ -251,7 +255,10 @@ export async function POST(req: Request) {
       openVisit: openVisit
         ? {
             id: String(openVisit._id),
-            items: (openVisit.items ?? []).map((i) => ({ name: i.name ?? "" })),
+            items: (openVisit.items ?? []).map((i) => ({
+              name: i.name ?? "",
+              addedAt: i.addedAt ? new Date(i.addedAt).toISOString() : null,
+            })),
             checkInAt: openVisit.checkInAt ? new Date(openVisit.checkInAt).toISOString() : null,
           }
         : null,

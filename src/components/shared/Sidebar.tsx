@@ -16,15 +16,19 @@ import {
 } from "@/components/ui/tooltip";
 import type { Role } from "@/types";
 import { getRoleConfig } from "@/config/roles";
+import { visibleNavForRole } from "@/lib/features";
 
 interface SidebarProps {
   role: Role;
+  /** Feature keys the Super Admin has switched off for this role. */
+  disabledFeatures?: string[];
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, disabledFeatures = [] }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const cfg = getRoleConfig(role);
+  const nav = visibleNavForRole(role, disabledFeatures);
 
   return (
     <TooltipProvider delayDuration={120}>
@@ -55,7 +59,7 @@ export function Sidebar({ role }: SidebarProps) {
             </p>
           )}
           <nav className="flex flex-col gap-1">
-            {cfg.nav.map((item) => {
+            {nav.map((item) => {
               const active =
                 pathname === item.href ||
                 (item.href !== cfg.dashboardPath && pathname.startsWith(item.href));

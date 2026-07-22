@@ -17,11 +17,20 @@ import { Logo } from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
 import { getRoleConfig } from "@/config/roles";
+import { visibleNavForRole } from "@/lib/features";
 
-export function MobileNav({ role }: { role: Role }) {
+export function MobileNav({
+  role,
+  disabledFeatures = [],
+}: {
+  role: Role;
+  /** Feature keys the Super Admin has switched off for this role. */
+  disabledFeatures?: string[];
+}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const cfg = getRoleConfig(role);
+  const nav = visibleNavForRole(role, disabledFeatures);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -47,7 +56,7 @@ export function MobileNav({ role }: { role: Role }) {
             {cfg.shortLabel}
           </p>
           <nav className="flex flex-col gap-1">
-            {cfg.nav.map((item) => {
+            {nav.map((item) => {
               const active =
                 pathname === item.href ||
                 (item.href !== cfg.dashboardPath && pathname.startsWith(item.href));

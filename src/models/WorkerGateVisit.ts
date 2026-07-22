@@ -6,9 +6,11 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
  * At morning IN the security officer records the items the worker brings in.
  * The record stays OPEN through the day (workers may leave/return at lunch) so
  * on every OUT scan the officer sees the recorded items to verify what's
- * leaving matches what came in. At final departure the officer either CLEARs
- * (deletes) or KEEPs (archives → CLOSED) the record. Attendance (MovementLog)
- * is written independently and is never affected by clearing items.
+ * leaving matches what came in. A worker returning from lunch may bring extra
+ * items — those are appended to the same OPEN record rather than replacing it,
+ * so the OUT check always covers everything currently on site with them.
+ * At final departure the record is closed (archived → CLOSED). Attendance
+ * (MovementLog) is written independently and never affected by item tracking.
  */
 const workerGateVisitSchema = new Schema(
   {
@@ -17,8 +19,12 @@ const workerGateVisitSchema = new Schema(
     workerCode: { type: String, default: "" }, // WRK-YYYY-XXXXX snapshot
     company: { type: String, default: "" },
 
-    /* Items brought IN in the morning */
-    items: { type: [{ name: { type: String, trim: true } }], default: [] },
+    /* Items brought IN. `addedAt` distinguishes the morning items from ones
+       added on a later re-entry (e.g. back from lunch with a new tool). */
+    items: {
+      type: [{ name: { type: String, trim: true }, addedAt: { type: Date, default: () => new Date() } }],
+      default: [],
+    },
     /* Items verified as taken OUT at departure (officer-edited copy) */
     itemsOutVerified: { type: [{ name: { type: String, trim: true } }], default: [] },
 

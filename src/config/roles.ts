@@ -30,6 +30,7 @@ import {
   ArrowLeftRight,
   BadgeCheck,
   Megaphone,
+  SlidersHorizontal,
 } from "lucide-react";
 
 import { ROLE_VALUES, type Role, type RoleConfig } from "@/types";
@@ -55,6 +56,7 @@ export const roleConfig: Record<Role, RoleConfig> = {
     nav: [
       { label: "Command Center", href: "/super-admin", icon: LayoutDashboard },
       { label: "User Management", href: "/super-admin/users", icon: Users },
+      { label: "Role Features", href: "/super-admin/role-features", icon: SlidersHorizontal },
       { label: "All Contractors", href: "/super-admin/contractors", icon: Building2 },
       { label: "All Employees", href: "/super-admin/employees", icon: HardHat },
       { label: "All Vehicles", href: "/super-admin/vehicles", icon: Truck },

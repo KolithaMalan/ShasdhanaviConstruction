@@ -6,6 +6,7 @@ import { connectDB } from "@/lib/db";
 import { EmployeeModel } from "@/models/Employee";
 import { BlacklistedNICModel } from "@/models/BlacklistedNIC";
 import { requireRole, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,9 @@ const bodySchema = z.object({
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const guard = await requireRole(["MEDICAL_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:medical.clear");
+  if (blocked) return blocked;
 
   const { id } = await ctx.params;
   if (!mongoose.Types.ObjectId.isValid(id)) return jsonError("Invalid id", 400);

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
-  KeyRound, Loader2, MoreHorizontal, Plus, Search, ShieldBan, ShieldCheck, UserPlus,
+  AtSign, KeyRound, Loader2, MoreHorizontal, Plus, Search, ShieldBan, ShieldCheck, UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -48,6 +48,18 @@ interface UserRow {
   createdAt: string;
 }
 
+/**
+ * Staff roles whose sign-in email the Super Admin may change from here.
+ * Contractor emails are deliberately excluded — they are tied to the approved
+ * contractor registration record.
+ */
+const EMAIL_EDITABLE_ROLES: Role[] = [
+  "ADMIN_HSEQ",
+  "MEDICAL_OFFICER",
+  "HSEQ_OFFICER",
+  "INTERNAL_SECURITY",
+];
+
 export default function SuperAdminUsersPage() {
   const [items, setItems] = useState<UserRow[] | null>(null);
   const [role, setRole] = useState<string>("ALL");
@@ -58,6 +70,7 @@ export default function SuperAdminUsersPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [tempPwd, setTempPwd] = useState<string | null>(null);
   const [resetConfirm, setResetConfirm] = useState<UserRow | null>(null);
+  const [emailTarget, setEmailTarget] = useState<UserRow | null>(null);
 
   function load() {
     const params = new URLSearchParams();
@@ -211,6 +224,11 @@ export default function SuperAdminUsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {EMAIL_EDITABLE_ROLES.includes(u.role) && (
+                            <DropdownMenuItem onSelect={() => setEmailTarget(u)} disabled={pending}>
+                              <AtSign className="mr-2 h-4 w-4" /> Change email
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onSelect={() => setResetConfirm(u)} disabled={pending}>
                             <KeyRound className="mr-2 h-4 w-4" /> Reset password
                           </DropdownMenuItem>
@@ -235,6 +253,18 @@ export default function SuperAdminUsersPage() {
          )}
       </MotionWrapper>
 
+      <Dialog open={!!emailTarget} onOpenChange={(v) => { if (!v) setEmailTarget(null); }}>
+        <DialogContent className="max-w-md">
+          {emailTarget && (
+            <ChangeEmailForm
+              user={emailTarget}
+              onClose={() => setEmailTarget(null)}
+              onSaved={() => { setEmailTarget(null); load(); }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={!!resetConfirm} onOpenChange={(v) => { if (!v) setResetConfirm(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -255,6 +285,83 @@ export default function SuperAdminUsersPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+/** Changes a staff account's sign-in email. */
+function ChangeEmailForm({
+  user, onSaved, onClose,
+}: { user: UserRow; onSaved: () => void; onClose: () => void }) {
+  const [email, setEmail] = useState(user.email);
+  const [pending, start] = useTransition();
+
+  const next = email.trim().toLowerCase();
+  const changed = next !== user.email.toLowerCase();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next);
+
+  function submit() {
+    start(async () => {
+      const res = await fetch(`/api/super-admin/users/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: next }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) { toast.error(body.message ?? "Failed to change email"); return; }
+      toast.success("Email changed", {
+        description: `${user.name} now signs in with ${next}.`,
+      });
+      onSaved();
+    });
+  }
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>Change sign-in email</DialogTitle>
+        <DialogDescription>
+          {user.name} · {getRoleConfig(user.role).label}
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <Label>Current email</Label>
+          <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-2 font-mono text-sm text-muted-foreground">
+            {user.email}
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="ce-email">New email</Label>
+          <Input
+            id="ce-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && changed && valid) submit(); }}
+          />
+          {changed && !valid && (
+            <p className="text-[11px] text-destructive">Enter a valid email address.</p>
+          )}
+        </div>
+        <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-700 dark:text-amber-400">
+          They must use the new email to sign in from now on. Their password is
+          unchanged — tell them before you save.
+        </p>
+      </div>
+
+      <DialogFooter>
+        <Button variant="ghost" onClick={onClose} disabled={pending}>Cancel</Button>
+        <Button
+          onClick={submit}
+          disabled={pending || !changed || !valid}
+          className="bg-[--color-brand-ocean] text-white hover:bg-[--color-brand-ocean]/90"
+        >
+          {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AtSign className="mr-2 h-4 w-4" />}
+          Save email
+        </Button>
+      </DialogFooter>
+    </>
   );
 }
 

@@ -7,12 +7,16 @@ import { additionalRequestSchema } from "@/lib/validators";
 import { notifyAdminAdditionalRequest } from "@/lib/email";
 import { findBlacklistedNICs, findDuplicateEmployeeNICs } from "@/lib/employee";
 import { requireRole, getBaseUrl, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const guard = await requireRole(["CONTRACTOR"]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:contractor.request");
+  if (blocked) return blocked;
 
   const body = await req.json().catch(() => null);
   const parsed = additionalRequestSchema.safeParse(body);

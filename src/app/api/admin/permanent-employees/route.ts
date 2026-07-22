@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
 import { requireRole, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 import { createPermanentEmployee, serializePermanentEmployee } from "@/lib/permanentEmployee";
 import { decodeImageDataUrl, processProfilePhoto } from "@/lib/photoService";
 import { logAction } from "@/lib/auditLogger";
@@ -46,6 +47,9 @@ export async function POST(req: Request) {
   // Registration authority moved from Nuwan to Dinesh (HSEQ_OFFICER).
   const guard = await requireRole(["HSEQ_OFFICER", "SUPER_ADMIN"]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:permanent.register");
+  if (blocked) return blocked;
 
   const body = (await req.json().catch(() => ({}))) as Body;
   const name = body.name?.trim();

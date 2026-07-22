@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { WorkerModel } from "@/models/Worker";
 import { requireRole, jsonError } from "@/lib/api";
+import { requireFeature } from "@/lib/featureService";
 import { createWorker, serializeWorker } from "@/lib/worker";
 import { decodeImageDataUrl, processProfilePhoto } from "@/lib/photoService";
 import { logAction } from "@/lib/auditLogger";
@@ -55,6 +56,9 @@ interface Body {
 export async function POST(req: Request) {
   const guard = await requireRole([...MANAGE_ROLES]);
   if (!guard.ok) return guard.response;
+
+  const blocked = await requireFeature(guard.session.user.role, "action:worker.register");
+  if (blocked) return blocked;
 
   const body = (await req.json().catch(() => ({}))) as Body;
   const name = body.name?.trim();

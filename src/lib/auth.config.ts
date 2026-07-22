@@ -2,6 +2,14 @@ import type { NextAuthConfig } from "next-auth";
 import { roleToDashboard } from "@/config/roles";
 import type { Role } from "@/types";
 
+/**
+ * Screens every signed-in role may reach regardless of its dashboard prefix —
+ * they appear in several roles' sidebars (or in the user menu / notification
+ * dropdown), so the per-role prefix rule below must not redirect away from
+ * them. The data behind each one is still guarded by `requireRole` in its API.
+ */
+const SHARED_AUTHENTICATED_PATHS = ["/profile", "/notifications", "/permanent-movements"];
+
 export const authConfig: NextAuthConfig = {
   pages: {
     signIn: "/",
@@ -33,6 +41,14 @@ export const authConfig: NextAuthConfig = {
         const loginUrl = new URL("/", nextUrl);
         loginUrl.searchParams.set("redirect", path);
         return Response.redirect(loginUrl);
+      }
+
+      if (
+        SHARED_AUTHENTICATED_PATHS.some(
+          (p) => path === p || path.startsWith(`${p}/`),
+        )
+      ) {
+        return true;
       }
 
       const role = auth.user.role as Role | undefined;
