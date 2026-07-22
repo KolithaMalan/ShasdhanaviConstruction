@@ -1,4 +1,4 @@
-import archiver from "archiver";
+import { ZipArchive } from "archiver";
 import { PassThrough } from "node:stream";
 
 import type { EmployeeDocument } from "@/models/Employee";
@@ -12,7 +12,7 @@ import { generateQRCode } from "@/lib/utils/generateQRCode";
  */
 export function generateBulkZIP(employees: EmployeeDocument[]): PassThrough {
   const stream = new PassThrough();
-  const archive = archiver("zip", { zlib: { level: 9 } });
+  const archive = new ZipArchive({ zlib: { level: 9 } });
 
   archive.on("warning", (err) => console.warn("[bulk-zip] warning:", err));
   archive.on("error", (err) => {
@@ -35,7 +35,8 @@ export function generateBulkZIP(employees: EmployeeDocument[]): PassThrough {
         console.warn(`[bulk-zip] skipped ${r.nicNumber}:`, err);
       }
     }
-    archive.finalize();
+    /* archiver v8 returns a promise here — await so failures hit the catch. */
+    await archive.finalize();
   })().catch((err) => {
     console.error("[bulk-zip] fatal:", err);
     stream.destroy(err as Error);

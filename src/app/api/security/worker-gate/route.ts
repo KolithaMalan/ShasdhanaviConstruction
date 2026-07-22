@@ -103,10 +103,14 @@ export async function POST(req: Request) {
     const visit = await WorkerGateVisitModel.findOne({ workerId: worker._id, status: "OPEN" });
     if (visit) {
       if (data.final) {
-        // Final departure — archive the record as history with verified items.
-        visit.itemsOutVerified = data.itemsTakenOut;
-        visit.checkOutAt = now;
-        visit.status = "CLOSED";
+        /* Final departure — archive the record as history with verified items.
+           `set` is used so Mongoose casts the plain objects into the
+           itemsOutVerified DocumentArray. */
+        visit.set({
+          itemsOutVerified: data.itemsTakenOut,
+          checkOutAt: now,
+          status: "CLOSED",
+        });
         await visit.save();
         visitInfo = { id: String(visit._id), status: "CLOSED" };
       } else {
