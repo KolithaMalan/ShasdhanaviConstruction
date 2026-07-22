@@ -4,7 +4,7 @@ import { useCallback, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import {
   AlertTriangle, Ban, Camera, CheckCircle2, Droplet, Hash, IdCard, Keyboard,
-  Loader2, RotateCcw, Search, ShieldAlert, User,
+  Loader2, Package, RotateCcw, Search, ShieldAlert, User,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -36,8 +36,15 @@ interface Person {
   blacklisted: boolean;
 }
 
+/** Open item record — Yuga/Soba workers only, absent for the other kinds. */
+interface Visit {
+  checkInAt: string | null;
+  gateLocation: string;
+  items: { name: string; addedAt: string | null }[];
+}
+
 type Result =
-  | { kind: "EMPLOYEE" | "PERMANENT" | "WORKER"; person: Person }
+  | { kind: "EMPLOYEE" | "PERMANENT" | "WORKER"; person: Person; visit?: Visit | null }
   | { kind: "ERROR"; code: string; message: string };
 
 const KIND_LABEL: Record<string, string> = {
@@ -51,6 +58,10 @@ function fmtDate(iso: string | null): string {
   return new Date(iso).toLocaleDateString("en-GB", {
     day: "2-digit", month: "short", year: "numeric",
   });
+}
+
+function fmtTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 function initialsFor(name: string): string {
@@ -194,7 +205,12 @@ export function IdVerifyWorkstation() {
                 </Button>
               </div>
             ) : (
-              <PersonCard kind={result.kind} person={result.person} onReset={reset} />
+              <PersonCard
+                kind={result.kind}
+                person={result.person}
+                visit={result.visit ?? null}
+                onReset={reset}
+              />
             )}
           </motion.div>
         )}
@@ -204,8 +220,8 @@ export function IdVerifyWorkstation() {
 }
 
 function PersonCard({
-  kind, person, onReset,
-}: { kind: string; person: Person; onReset: () => void }) {
+  kind, person, visit, onReset,
+}: { kind: string; person: Person; visit: Visit | null; onReset: () => void }) {
   /* Anything other than an active, medically-cleared, unexpired record is
      worth flagging to the officer standing in front of the person. */
   const expired = !!person.idCardExpiresAt && new Date(person.idCardExpiresAt) < new Date();
@@ -296,6 +312,57 @@ function PersonCard({
         <Field icon={Droplet} label="Blood type" value={person.bloodType} emphasis />
       </dl>
 
+      {/* Items the worker carried in and has not yet signed out (workers only). */}
+      {kind === "WORKER" && (
+        <div className="mt-5 rounded-xl border border-border/60 bg-background/50 p-4">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <Package className="h-4 w-4 text-[--color-brand-ocean]" />
+            <p className="text-sm font-semibold">Items brought into site</p>
+            {visit?.items.length ? (
+              <span className="rounded-md bg-[--color-brand-ocean]/15 px-2 py-0.5 text-[10px] font-bold text-[--color-brand-ocean]">
+                {visit.items.length}
+              </span>
+            ) : null}
+          </div>
+
+          {!visit ? (
+            <p className="text-xs text-muted-foreground">
+              No open gate record — this worker has not checked in today, or the
+              record was closed at final departure.
+            </p>
+          ) : visit.items.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              Checked in{visit.checkInAt ? ` at ${fmtTime(visit.checkInAt)}` : ""} with
+              no items recorded.
+            </p>
+          ) : (
+            <>
+              <p className="mb-3 text-[11px] text-muted-foreground">
+                Recorded at the gate
+                {visit.checkInAt ? ` from ${fmtTime(visit.checkInAt)}` : ""}
+                {visit.gateLocation ? ` · ${visit.gateLocation}` : ""}. These must
+                all leave with them.
+              </p>
+              <ul className="space-y-1.5">
+                {visit.items.map((it, idx) => (
+                  <li
+                    key={`${it.name}-${idx}`}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-card/70 px-3 py-2 text-sm"
+                  >
+                    <span className="min-w-0 wrap-break-word font-medium">{it.name}</span>
+                    {it.addedAt && (
+                      <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
+                        {fmtTime(it.addedAt)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+
       <Button onClick={onReset} className="mt-5 h-12 w-full rounded-lg" variant="outline">
         <RotateCcw className="mr-2 h-4 w-4" /> Scan another
       </Button>
@@ -320,7 +387,7 @@ function Field({
       </dt>
       <dd
         className={cn(
-          "mt-1 break-words text-sm font-medium",
+          "mt-1 wrap-break-word text-sm font-medium",
           mono && "font-mono",
           emphasis && "text-base font-bold text-[--color-brand-orange]",
         )}

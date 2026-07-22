@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { EmployeeModel } from "@/models/Employee";
 import { PermanentEmployeeModel } from "@/models/PermanentEmployee";
 import { WorkerModel } from "@/models/Worker";
+import { WorkerGateVisitModel } from "@/models/WorkerGateVisit";
 import { BlacklistedNICModel } from "@/models/BlacklistedNIC";
 import { parseQr } from "@/lib/qr";
 import { serializeEmployee } from "@/lib/employee";
@@ -160,10 +161,27 @@ export async function POST(req: Request) {
       });
     }
 
+    /* Item tracking is workers-only, so this block has no equivalent for the
+       other two kinds. Shows what they carried in and have not signed out. */
+    const openVisit = await WorkerGateVisitModel.findOne({
+      workerId: doc._id,
+      status: "OPEN",
+    }).lean();
+
     audit(`${doc.name} (${doc.workerId})`);
 
     return NextResponse.json({
       kind: "WORKER",
+      visit: openVisit
+        ? {
+            checkInAt: openVisit.checkInAt ? new Date(openVisit.checkInAt).toISOString() : null,
+            gateLocation: openVisit.gateLocation ?? "",
+            items: (openVisit.items ?? []).map((i) => ({
+              name: i.name ?? "",
+              addedAt: i.addedAt ? new Date(i.addedAt).toISOString() : null,
+            })),
+          }
+        : null,
       person: {
         name: doc.name,
         photoUrl: doc.photoUrl ?? "",
