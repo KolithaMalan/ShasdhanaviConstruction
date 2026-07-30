@@ -26,9 +26,12 @@ export const config = {
      * Protect everything except:
      * - api routes
      * - _next/static, _next/image
-     * - favicon, public assets
-     * - the welcome page "/" and /login
+     * - the welcome page "/" and /login, /contractor-registration
+     * - any file in /public (matched by the ".<ext>" in the final segment) —
+     *   e.g. Homevideo.mp4, bg1.png, Sahas.png, icon.png, robots.txt.
+     *   Without this, middleware redirects those static requests to login and
+     *   the hero video + site photos never load.
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|logo.svg|Sahas.png|login|contractor-registration|$).*)",
+    "/((?!api|_next/static|_next/image|login|contractor-registration|$|.*\\.[\\w]+$).*)",
   ],
 };
