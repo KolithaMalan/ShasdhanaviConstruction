@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, KeyRound, Loader2, ShieldCheck, User as UserIcon } from "lucide-react";
+import { Check, Eye, EyeOff, KeyRound, Loader2, Mail, Pencil, ShieldCheck, User as UserIcon, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -18,6 +18,14 @@ import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/lib/utils";
 import { getRoleConfig } from "@/config/roles";
 import type { Role } from "@/types";
+
+const ALLOWED_EMAIL_CHANGE_ROLES: Role[] = [
+  "ADMIN_HSEQ",
+  "MEDICAL_OFFICER",
+  "HSEQ_OFFICER",
+  "SECURITY_OFFICER",
+  "INTERNAL_SECURITY",
+];
 
 interface Profile {
   id: string;
@@ -70,6 +78,16 @@ export default function ProfilePage() {
   const [showNew, setShowNew] = useState(false);
   const [pending, start] = useTransition();
 
+  /* ─── Email change state ─── */
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [emailPending, startEmailTransition] = useTransition();
+
+  const canChangeEmail = profile
+    ? ALLOWED_EMAIL_CHANGE_ROLES.includes(profile.role)
+    : false;
+
   const {
     register, handleSubmit, watch, reset,
     formState: { errors },
@@ -99,6 +117,27 @@ export default function ProfilePage() {
       if (!res.ok) { toast.error(body.message ?? "Failed"); return; }
       toast.success("Password updated", { description: "Use the new password on next sign-in." });
       reset();
+    });
+  }
+
+  function onEmailSave() {
+    setEmailError("");
+    if (!newEmail.trim()) { setEmailError("Email is required"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail.trim())) {
+      setEmailError("Enter a valid email address");
+      return;
+    }
+    startEmailTransition(async () => {
+      const res = await fetch("/api/profile/change-email", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail: newEmail.trim() }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) { setEmailError(body.message ?? "Failed to update email"); return; }
+      toast.success("Email updated", { description: `Changed to ${body.email}` });
+      setProfile((p) => p ? { ...p, email: body.email } : p);
+      setEditingEmail(false);
     });
   }
 
@@ -152,6 +191,75 @@ export default function ProfilePage() {
           )}
         </div>
       </MotionWrapper>
+
+      {/* ─── Change Email (staff roles only) ─── */}
+      {canChangeEmail && profile && (
+        <MotionWrapper delay={0.07}>
+          <div className="space-y-4 rounded-2xl border border-border/60 bg-card/60 p-6 backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/15 text-violet-500">
+                <Mail className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-heading text-lg font-semibold">Email Address</h3>
+                <p className="text-xs text-muted-foreground">Update the email used for login and notifications.</p>
+              </div>
+            </div>
+
+            {!editingEmail ? (
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-sm text-muted-foreground">{profile.email}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5 rounded-lg text-xs"
+                  onClick={() => { setNewEmail(profile.email); setEmailError(""); setEditingEmail(true); }}
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Change
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="newEmail">New Email</Label>
+                  <Input
+                    id="newEmail"
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => { setNewEmail(e.target.value); setEmailError(""); }}
+                    className="h-11 max-w-md"
+                    disabled={emailPending}
+                    placeholder="new@example.com"
+                    autoFocus
+                  />
+                  {emailError && <p className="text-xs text-destructive">{emailError}</p>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    disabled={emailPending}
+                    onClick={onEmailSave}
+                    className="h-9 gap-1.5 rounded-lg bg-[--color-brand-ocean] text-white hover:bg-[--color-brand-ocean]/90"
+                  >
+                    {emailPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={emailPending}
+                    onClick={() => { setEditingEmail(false); setEmailError(""); }}
+                    className="h-9 gap-1.5 rounded-lg"
+                  >
+                    <X className="h-4 w-4" /> Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </MotionWrapper>
+      )}
 
       <MotionWrapper delay={0.1}>
         <form onSubmit={handleSubmit(onSubmit)}
