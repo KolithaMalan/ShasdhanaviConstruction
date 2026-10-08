@@ -30,8 +30,8 @@ export const siteConfig = {
   copyright: `© ${new Date().getFullYear()} Sahasdhanavi Construction. All rights reserved.`,
   contact: {
     address: "Sahasdhanavi Power Plant Construction Site, Sri Lanka",
-    email: "sahasdhanavi.epc@gmail.com",
-    phone: "+94 778561467",
+    email: "system.alerts@ltl.lk",
+    phone: "+94 740207443",
   },
   links: {
     safety: "/#safety",
